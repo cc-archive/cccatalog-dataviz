@@ -1,0 +1,31 @@
+<head>
+  <style> body { margin: 0; } </style>
+  <meta charset="utf-8"/>
+  <script src="http://unpkg.com/force-graph"></script>
+  <!--<script src="../../dist/force-graph.js"></script>-->
+</head>
+
+<body>
+  <div id="graph"></div>
+
+  <script>
+     //nodes and links from a file
+      fetch('datasets/info.json').then(res => res.json()).then(data => {
+        const elem = document.getElementById('graph');
+        const Graph = ForceGraph()
+        (document.getElementById('graph'))
+        .backgroundColor('#101020')
+        //.enablePointerInteraction(true) //needs to be true or nodeHover and nodeClick won't work
+        .nodeRelSize(6)
+        .nodeLabel(node => `${node.id}`)
+        .linkColor(() => 'rgba(255,255,255,0.2)')
+        .linkDirectionalParticles(1)
+        .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
+        .onNodeClick(node => console.log(node.id))
+        .zoom(1)
+        .graphData(data);
+      });
+      //source: https://github.com/vasturiano/force-graph/blob/master/example/medium-graph/index.html
+      //data: https://github.com/vasturiano/force-graph/blob/master/example/datasets/blocks.json
+  </script>
+</body>

@@ -1,0 +1,41 @@
+<head>
+  <style> body { margin: 0; } </style>
+  <meta charset="utf-8"/>
+  <script src="http://unpkg.com/force-graph"></script>
+  <!--<script src="../../dist/force-graph.js"></script>-->
+</head>
+
+<body>
+  <div id="graph"></div>
+
+  <script>
+     // use standard resolution in retina displays
+    // Random ids 
+    const N = 30000;
+    const elem = document.getElementById('graph');
+    const gData = {
+      nodes: [...Array(N).keys()].map(i => ({ id: i })),
+      links: [...Array(N).keys()]
+        .filter(id => id)
+        .map(id => ({
+          source: id,
+          target: Math.round(Math.random() * (id-1))
+        }))
+    };
+    const Graph = ForceGraph()
+      (document.getElementById('graph'))
+        .backgroundColor('#101020')
+        //.enablePointerInteraction(true) //needs to be true or nodeHover and nodeClick won't work
+        .linkDirectionalParticles(1)
+        .d3AlphaDecay(0)
+        .d3VelocityDecay(0.08)
+        .warmupTicks(20)
+        .cooldownTicks(0)
+        .nodeLabel(node => `${node.id}`)
+        .linkColor(() => 'rgba(255,255,255,0.2)')
+        .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
+        .onNodeClick(node => console.log(node.id))
+        .zoom(1)
+        .graphData(gData);
+  </script>
+</body>
