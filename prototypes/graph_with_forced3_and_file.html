@@ -1,31 +1,196 @@
-<head>
-  <style> body { margin: 0; } </style>
+<html>
+  <head>
+  
   <meta charset="utf-8"/>
-  <script src="http://unpkg.com/force-graph"></script>
+  <script src="js/force-graph.min.js"></script>
+  <script src="http://unpkg.com/index-array-by"></script>
+  <script src="http://unpkg.com/dat.gui@0.7.2"></script>
+  <script src="http://unpkg.com/tinycolor2"></script>
+  <link rel="stylesheet" href="css/forced3.css" type="text/css">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
+  <script src="js/export-data.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="css/materialize.css" type="text/css">
   <!--<script src="../../dist/force-graph.js"></script>-->
 </head>
 
 <body>
-  <div id="graph"></div>
+
+  <div id="graph" class="visualization" ></div>
+
+    <div id="pieChartModal" class="modal">
+      <div class="modal-content" >
+        <div id="pieChartContainer"></div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+     </div>
+    </div>
+
 
   <script>
-     //nodes and links from a file
-      fetch('datasets/info.json').then(res => res.json()).then(data => {
-        const elem = document.getElementById('graph');
-        const Graph = ForceGraph()
-        (document.getElementById('graph'))
-        .backgroundColor('#101020')
-        //.enablePointerInteraction(true) //needs to be true or nodeHover and nodeClick won't work
-        .nodeRelSize(6)
-        .nodeLabel(node => `${node.id}`)
-        .linkColor(() => 'rgba(255,255,255,0.2)')
-        .linkDirectionalParticles(1)
-        .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
-        .onNodeClick(node => console.log(node.id))
-        .zoom(1)
-        .graphData(data);
+    //data structure for the pie chart
+    license_data = [{
+            name: 'license1',
+            y: 5,
+        }, {
+            name: 'license2',
+            y: 4
+        }, {
+            name: 'license3',
+            y: 3
+        }, {
+            name: 'license4',
+            y: 2
+        }, {
+            name: 'license5',
+            y: 3
+        }, {
+            name: 'license6',
+            y: 3
+        }];
+
+    function drawPieChart(node) {
+      //function for rendering the pie chart inside a modal
+      data = license_data;
+      Highcharts.chart('pieChartContainer', {
+          chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false,
+              type: 'pie'
+          },
+          title: {
+              text: 'Use of CC licenses by type'
+          },
+          tooltip: {
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          plotOptions: {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: false
+                  },
+                  showInLegend: true
+              }
+          },
+          series: [{
+              name: 'License',
+              colorByPoint: true,
+              data: data
+          }]
       });
+      $('#pieChartModal').modal();
+    }
+     
+    function traverseHighlight(domain, degree = -1) {
+      if (!domain) return;
+      if (highlightNodes.has(domain)) { // already been here
+        highlightNodes.set(domain, Math.min(degree, highlightNodes.get(domain))); // keep closest degree
+        return;
+      }
+
+      highlightNodes.set(domain, degree);
+       /* 
+      Object.entries(linksPerDomains[domain] || {})
+        .forEach(([targetDomain]) => traverseHighlight(targetDomain, degree + 1));
+        */
+    }
+
+    //get width and height of the window
+    //w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+    //nodes and links from a file
+    fetch('datasets/les-miserables.json').then(res => res.json()).then(data => {
+
+      let hoverLink = null;
+      let hoverNode = null;
+      highlightNodes = new Map();
+      linksPerDomains = indexBy(data.links, ['source', 'target']);// Dual-indexed by source domain > target domain
+      domains = new Set(data.nodes.map(i => ({ id: i , data:license_data})));
+
+      const elem = document.getElementById('graph');
+      const Graph = ForceGraph()
+      (elem)
+      .backgroundColor('#07263b')
+      .graphData(data)
+      //forces
+      //.d3AlphaDecay(1)
+      .d3VelocityDecay(0.05)
+      .warmupTicks(10)
+      .cooldownTicks(0)
+
+      .zoom(2)
+      // links
+      .onLinkHover(link => hoverLink = link)
+      .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 5 : 1)
+      .linkColor(link => link === hoverLink ? 'white' : '#49fffd')
+      //.linkHoverPrecision(10)
+      .linkDirectionalArrowLength(5)
+      .nodeRelSize(7)
+       //draw nodes
+      .nodeLabel(node => `${node.id}`)
+      .onNodeClick(node => drawPieChart(node))
+      .nodeVal(node => node.id.length)
+      .nodeCanvasObjectMode(node => 'replace')
+      .nodeCanvasObject((node, ctx, globalScale) => {
+        ctx.beginPath();
+        var node_size = node.id.length;
+        ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
+        ctx.lineWidth = globalScale*0.05;
+        ctx.fillStyle = 'rgb(207, 235, 222)'; //fill color
+        ctx.strokeStyle = '#004c4b'; //border color
+        ctx.fill();
+        ctx.stroke();
+
+        //add text to nodes
+        const label = node.id;
+        const fontSize = globalScale*0.5;
+        ctx.font = `${fontSize}px Sans-Serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#008477'; //text color
+        ctx.fillText(label, node.x, node.y);
+      })
+      //highlighting neighbors
+      .onNodeHover( node => {
+          hoverNode = node;
+          elem.style.cursor = node ? 'pointer' : null;
+
+          highlightNodes.clear();
+          if (node) {
+            otherGraph = traverseHighlight(node.id);
+          }
+        });
+       
+
+     
+     /*
+     //nodes as labels
+     .nodeCanvasObject((node, ctx, globalScale) => {
+          const label = node.id;
+          const fontSize = globalScale*0.5;
+          ctx.font = `${fontSize}px Sans-Serif`;
+          const textWidth = ctx.measureText(label).width;
+          //const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          //ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = node.color;
+          ctx.fillText(label, node.x, node.y);
+        });
+      */
+    });
+
       //source: https://github.com/vasturiano/force-graph/blob/master/example/medium-graph/index.html
       //data: https://github.com/vasturiano/force-graph/blob/master/example/datasets/blocks.json
   </script>
 </body>
+</html>
