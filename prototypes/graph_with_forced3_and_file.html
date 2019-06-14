@@ -121,7 +121,7 @@
       .backgroundColor('#07263b')
       .graphData(data)
       //forces
-      //.d3AlphaDecay(1)
+      .d3AlphaDecay(0.0228)
       .d3VelocityDecay(0.05)
       .warmupTicks(10)
       .cooldownTicks(0)
@@ -130,10 +130,9 @@
       // links
       .onLinkHover(link => hoverLink = link)
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 5 : 1)
-      .linkColor(link => link === hoverLink ? 'white' : '#49fffd')
+      .linkColor(link => link === hoverLink ? 'white' : 'rgb(155, 216, 240)')
       //.linkHoverPrecision(10)
       .linkDirectionalArrowLength(5)
-      .nodeRelSize(7)
        //draw nodes
       .nodeLabel(node => `${node.id}`)
       .onNodeClick(node => drawPieChart(node))
@@ -141,10 +140,10 @@
       .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
-        var node_size = node.id.length;
+        var node_size = node.id.length/2;
         ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
         ctx.lineWidth = globalScale*0.05;
-        ctx.fillStyle = 'rgb(207, 235, 222)'; //fill color
+        ctx.fillStyle = '#49fffd'; //fill color
         ctx.strokeStyle = '#004c4b'; //border color
         ctx.fill();
         ctx.stroke();
@@ -155,7 +154,7 @@
         ctx.font = `${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#008477'; //text color
+        ctx.fillStyle = '#6ab9c6'; //text color
         ctx.fillText(label, node.x, node.y);
       })
       //highlighting neighbors
