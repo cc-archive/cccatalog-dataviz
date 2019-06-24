@@ -105,6 +105,7 @@
     //get width and height of the window
     //w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    const MAX_FONT_SIZE = 2;
 
     //nodes and links from a file
     fetch('datasets/les-miserables.json').then(res => res.json()).then(data => {
@@ -120,41 +121,36 @@
       (elem)
       .backgroundColor('#07263b')
       .graphData(data)
-      //forces
-      .d3AlphaDecay(0.0228)
-      .d3VelocityDecay(0.05)
-      .warmupTicks(10)
-      .cooldownTicks(0)
-
       .zoom(2)
       // links
       .onLinkHover(link => hoverLink = link)
-      .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 5 : 1)
-      .linkColor(link => link === hoverLink ? 'white' : 'rgb(155, 216, 240)')
+      .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
+      .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240)')
       //.linkHoverPrecision(10)
       .linkDirectionalArrowLength(5)
        //draw nodes
-      .nodeLabel(node => `${node.id}`)
       .onNodeClick(node => drawPieChart(node))
+      .nodeLabel(node => `${node.id}`)
       .nodeVal(node => node.id.length)
       .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
         var node_size = node.id.length/2;
         ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
-        ctx.lineWidth = globalScale*0.05;
-        ctx.fillStyle = '#49fffd'; //fill color
-        ctx.strokeStyle = '#004c4b'; //border color
+        ctx.lineWidth = globalScale*0.03;
+        ctx.fillStyle = '#3ededc'; //fill color
+        ctx.strokeStyle = '#07263b'; //border color
         ctx.fill();
         ctx.stroke();
 
         //add text to nodes
         const label = node.id;
-        const fontSize = globalScale*0.5;
+        //set bounds for the labels
+        const fontSize = Math.min(MAX_FONT_SIZE,globalScale*0.5);
         ctx.font = `${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#6ab9c6'; //text color
+        ctx.fillStyle = '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea original:#279e9c
         ctx.fillText(label, node.x, node.y);
       })
       //highlighting neighbors
