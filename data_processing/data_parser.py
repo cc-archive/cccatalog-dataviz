@@ -21,6 +21,7 @@ for chunk in pd.read_csv(filename, sep="\t", escapechar="\\", chunksize=chunksiz
     df = df.dropna()
     total_df = pd.concat([total_df,df])
 
+#save temporal file
 total_df.to_csv("temp/"+filename,sep="\t", escapechar="\\", index=False)
 logging.info("END OF PRUNING")
 
@@ -30,20 +31,15 @@ for chunk in pd.read_csv(filename, sep="\t", escapechar="\\", chunksize=chunksiz
 	#Return to step 1: remove circular links
 	df = chunk[chunk["source"]!=chunk["target"]]
 
-	#Step 3. Create a method to format the domain name in the 'provider_domain'
+	#Step 3. Create a method to format the domain name in the 'provider_domain' and  'target'
 	df["source"] = df["source"].apply(getDomainName)
+	df["target"] = df["target"].apply(getDomainName)
+
 
 	#Step 4. Aggregate the data (sum all images and total links) group by domain
 	df.groupby("source").sum()
 	total_df = pd.concat([total_df,df])
 
 convertToJSON(total_df)
-
-
-    
-
-    #temporarily write to file
-    #logging.info('Write output to file')
-
 
 
