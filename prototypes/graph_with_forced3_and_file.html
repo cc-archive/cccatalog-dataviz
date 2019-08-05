@@ -55,6 +55,7 @@
 
     function drawPieChart(node) {
       //function for rendering the pie chart inside a modal
+      //format: "cc_licenses": {"('by', '3.0')": 2, "('by-nc-nd', '3.0')": 1, "('by', '4.0')": 33, "('by-nc-sa', '4.0')": 1},
       data = license_data;
       Highcharts.chart('pieChartContainer', {
           chart: {
@@ -64,7 +65,7 @@
               type: 'pie'
           },
           title: {
-              text: 'Use of CC licenses by type'
+              text: 'Use of CC licenses by '+node.provider_domain
           },
           tooltip: {
               pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -114,14 +115,13 @@
       let hoverNode = null;
       highlightNodes = new Map();
       linksPerDomains = indexBy(data.links, ['source', 'target']);// Dual-indexed by source domain > target domain
-      domains = new Set(data.nodes.map(i => ({ id: i , data:license_data})));
+      //domains = new Set(data.nodes.map(i => ({ id: i , data:license_data})));
 
       const elem = document.getElementById('graph');
       const Graph = ForceGraph()
       (elem)
       .backgroundColor('#07263b')
       .graphData(data)
-      .zoom(2)
       // links
       .onLinkHover(link => hoverLink = link)
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
@@ -131,11 +131,10 @@
        //draw nodes
       .onNodeClick(node => drawPieChart(node))
       .nodeLabel(node => `${node.id}`)
-      .nodeVal(node => node.id.length)
       .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
-        var node_size = node.id.length/2;
+        var node_size = 20/2;
         ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
         ctx.lineWidth = globalScale*0.03;
         ctx.fillStyle = '#3ededc'; //fill color

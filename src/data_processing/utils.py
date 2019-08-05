@@ -3,6 +3,7 @@ from tldextract import extract
 import json
 import logging
 from os import path
+import ast
 
 LICENSES_NAMES = ["by","by-sa","by-nd","by-nc","by-nc-sa","by-nc-nd"]
 TEMP_FOLDER = "temp"
@@ -37,11 +38,38 @@ def getDomainName(_provider_domain):
     res = extract(_provider_domain)
     return res.domain
 
-def CustomParser(data):
-    import json
-    json_data = json.loads(data)
-    return json_data
+def LinksReader(data):
+    """Helper function that loads the json of links to a DataFrame column"""
+    data = data.replace("\'", "\"")
 
+    try: 
+        json_data = json.loads(data)
+        return json_data
+    except ValueError:  # includes simplejson.decoder.JSONDecodeError
+        logging.info("Links json is invalid")
+        return None
+    #json_data = ast.literal_eval(data)
+
+def LicensesReader(data):
+    """Helper function that loads the json of cc_licences to a DataFrame column"""
+    data = data.replace("(", "\"(")
+    data = data.replace(")", ")\"")
+    try: 
+        json_data = json.loads(data)
+        if(len(json_data)==0):
+            logging.info("CC_license json is empty")
+            return None
+        return json_data
+    except ValueError:  # includes simplejson.decoder.JSONDecodeError
+        logging.info("CC_license json is invalid")
+        return None
+    return(json_data)
+
+def extract_links_len(row):
+    domain_name = row["domain_name"]
+    if(domain_name in row["links"]):
+        del row["links"][domain_name]
+    return len(list(row["links"].keys()))
 
 def expandToSourcesTargets(_file_path):
     """Function that receives a tsv file path and returns the path of an extended and processed
@@ -107,17 +135,20 @@ def expandToSourcesTargets(_file_path):
 
     return None
 
-def convertToJSON(_df):
+def toJSON(_df_nodes, _df_links):
     """Function that converts a dataframe to the expected file source format by force-d3, 
     in order to create the force-directed graph."""
     logging.info("CREATING NODES AND LINKS FILE")
-    nodes_df = _df[["source","images"]]
-    nodes_df = nodes_df.rename(index=str, columns={"source":"id"})
+    
+    #Nodes list of dictionaries
+    nodes_df = _df_nodes.rename(index=str, columns={"domain_name":"id"})
     nodes_dict = nodes_df.to_dict('records')
-    links_df = _df[["source","target","value"]]
-    links_dict = links_df.to_dict('records')
+    
+    #Links list of dictionaries
+    links_dict = _df_links.to_dict('records')
     total_data = {"nodes":nodes_dict, "links":links_dict}
+
+    #Join both lists
     with open('graph_data_input_file.json', 'w') as file:
         file.write(json.dumps(total_data)) 
         logging.info("END")
-  
