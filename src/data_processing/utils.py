@@ -65,6 +65,9 @@ def LicensesReader(data):
         return None
     return(json_data)
 
+def LicensesQtyReader(data):
+    return float(data)
+
 def extract_links_len(row):
     domain_name = row["domain_name"]
     if(domain_name in row["links"]):

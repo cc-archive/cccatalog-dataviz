@@ -17,3 +17,7 @@
 .modal {
   position: fixed;
 }
+
+.highcharts-title .tspan:nth-child(2){
+	font-weight: bold;
+}

@@ -1,0 +1,218 @@
+<html>
+  <head>
+  
+  <meta charset="utf-8"/>
+  <script src="js/force-graph.min.js"></script>
+  <script src="http://unpkg.com/index-array-by"></script>
+  <script src="http://unpkg.com/dat.gui@0.7.2"></script>
+  <script src="http://unpkg.com/tinycolor2"></script>
+  <link rel="stylesheet" href="css/forced3.css" type="text/css">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
+  <script src="js/export-data.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="css/materialize.css" type="text/css">
+  <!--<script src="../../dist/force-graph.js"></script>-->
+</head>
+
+<body>
+
+  <div id="graph" class="visualization" ></div>
+
+    <div id="pieChartModal" class="modal">
+      <div class="modal-content" >
+        <div id="pieChartContainer"></div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+     </div>
+    </div>
+
+
+  <script>
+    function beautifyLicensename(string){
+      no_comma = string.replace(",", " v.");
+      no_apostrophe = no_comma.replace(/'+/g, "");
+      if(no_apostrophe.substring(0,2)=="by"){
+        final_name = "cc "+ no_apostrophe;
+      }
+      else{
+        final_name = no_apostrophe;
+      }
+      return final_name;
+
+    }
+    function drawPieChart(node) {
+      //function for rendering the pie chart inside a modal
+
+      //if the node does not have licensed content
+      if(node.provider_domain=="Domain not available"){
+         var chart_container = document.getElementById("pieChartContainer");
+         var content = document.createTextNode(node.provider_domain);
+         chart_container.appendChild(content);
+      }
+      else{
+        data = node.cc_licenses;
+        licensed_data = [] 
+        for (license in data) {
+          //build a dictionary with license as key and as value, the number of licenses
+          element = {}
+          element.name = beautifyLicensename(license.substring(1, license.length-1));
+          element.y = data[license];
+          //push that dictionary to a list
+          licensed_data.push(element)
+        }
+        
+        Highcharts.chart('pieChartContainer', {
+            exporting: {
+            showTable: false,
+            tableCaption: '<br><b>Data table</b>',
+            },
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
+            },
+            subtitle: {
+                text: 'Total licensed work: <b>'+ node.licenses_qty + '</b>'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: {point.percentage:.1f}%'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                      enabled: true,
+                      format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                      style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                      }
+                    }
+                    //showInLegend: true   
+                }
+            },
+            series: [{
+                name: 'License',
+                colorByPoint: true,
+                data: licensed_data
+            }]
+        });
+      }
+      //show the modal
+      $('#pieChartModal').modal();
+    }
+     
+    function traverseHighlight(domain, degree = -1) {
+      if (!domain) return;
+      if (highlightNodes.has(domain)) { // already been here
+        highlightNodes.set(domain, Math.min(degree, highlightNodes.get(domain))); // keep closest degree
+        return;
+      }
+
+      highlightNodes.set(domain, degree);
+        
+      Object.entries(linksPerDomains[domain] || {})
+        .forEach(([targetDomain]) => traverseHighlight(targetDomain, degree + 1));
+        
+    }
+
+    //get width and height of the window
+    //w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    const MAX_FONT_SIZE = 2;
+
+    window.devicePixelRatio = 1; // use standard resolution in retina displays
+    //Start by loading nodes and links from a file
+    fetch('graph_data_input_file.json').then(res => res.json()).then(data => {
+
+      let hoverLink = null;
+      let hoverNode = null;
+      highlightNodes = new Map();
+      linksPerDomains = indexBy(data.links, ['source', 'target']);// Dual-indexed by source domain > target domain
+      //domains = new Set(data.nodes.map(i => ({ id: i , data:license_data})));
+
+      const elem = document.getElementById('graph');
+      const Graph = ForceGraph()
+      (elem)
+      .backgroundColor('#07263b')
+      .graphData(data)
+      // links
+      .onLinkHover(link => hoverLink = link)
+      .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
+      .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240)')
+      //.linkHoverPrecision(10)
+      .zoom(0.1)
+      .d3AlphaDecay(0)
+      .d3VelocityDecay(0.08)
+      .cooldownTicks(10)
+      //.cooldownTime(10000)
+      //.enablePointerInteraction(false)
+      //.linkDirectionalArrowLength(5)
+       //draw nodes
+      .onNodeClick(node => drawPieChart(node))
+      .nodeLabel(node => `${node.id}`)
+      .nodeCanvasObjectMode(node => 'replace')
+      .nodeCanvasObject((node, ctx, globalScale) => {
+        ctx.beginPath();
+        var node_size = 10;
+        ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
+        ctx.lineWidth = globalScale*0.03;
+        ctx.fillStyle = '#3ededc'; //fill color
+        ctx.strokeStyle = '#07263b'; //border color
+        ctx.fill();
+        ctx.stroke();
+
+        //add text to nodes
+        const label = node.id;
+        //set bounds for the labels
+        const fontSize = Math.min(MAX_FONT_SIZE,globalScale*0.5);
+        ctx.font = `${fontSize}px Sans-Serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea original:#279e9c
+        ctx.fillText(label, node.x, node.y);
+      })
+      //highlighting neighbors
+      .onNodeHover( node => {
+          hoverNode = node;
+          elem.style.cursor = node ? 'pointer' : null;
+
+          highlightNodes.clear();
+          if (node) {
+            otherGraph = traverseHighlight(node.id);
+          }
+        });
+       
+
+     
+     /*
+     //nodes as labels
+     .nodeCanvasObject((node, ctx, globalScale) => {
+          const label = node.id;
+          const fontSize = globalScale*0.5;
+          ctx.font = `${fontSize}px Sans-Serif`;
+          const textWidth = ctx.measureText(label).width;
+          //const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          //ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = node.color;
+          ctx.fillText(label, node.x, node.y);
+        });
+      */
+    });
+
+      //source: https://github.com/vasturiano/force-graph/blob/master/example/medium-graph/index.html
+      //data: https://github.com/vasturiano/force-graph/blob/master/example/datasets/blocks.json
+  </script>
+</body>
+</html>

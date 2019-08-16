@@ -32,60 +32,81 @@
 
 
   <script>
-    //data structure for the pie chart
-    license_data = [{
-            name: 'license1',
-            y: 5,
-        }, {
-            name: 'license2',
-            y: 4
-        }, {
-            name: 'license3',
-            y: 3
-        }, {
-            name: 'license4',
-            y: 2
-        }, {
-            name: 'license5',
-            y: 3
-        }, {
-            name: 'license6',
-            y: 3
-        }];
+    function beautifyLicensename(string){
+      no_comma = string.replace(",", " v.");
+      no_apostrophe = no_comma.replace(/'+/g, "");
+      if(no_apostrophe.substring(0,2)=="by"){
+        final_name = "cc "+ no_apostrophe;
+      }
+      else{
+        final_name = no_apostrophe;
+      }
+      return final_name;
 
+    }
     function drawPieChart(node) {
       //function for rendering the pie chart inside a modal
-      //format: "cc_licenses": {"('by', '3.0')": 2, "('by-nc-nd', '3.0')": 1, "('by', '4.0')": 33, "('by-nc-sa', '4.0')": 1},
-      data = license_data;
-      Highcharts.chart('pieChartContainer', {
-          chart: {
-              plotBackgroundColor: null,
-              plotBorderWidth: null,
-              plotShadow: false,
-              type: 'pie'
-          },
-          title: {
-              text: 'Use of CC licenses by '+node.provider_domain
-          },
-          tooltip: {
-              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-          },
-          plotOptions: {
-              pie: {
-                  allowPointSelect: true,
-                  cursor: 'pointer',
-                  dataLabels: {
-                      enabled: false
-                  },
-                  showInLegend: true
-              }
-          },
-          series: [{
-              name: 'License',
-              colorByPoint: true,
-              data: data
-          }]
-      });
+
+      //if the node does not have licensed content
+      if(node.provider_domain=="Domain not available"){
+         var chart_container = document.getElementById("pieChartContainer");
+         var content = document.createTextNode(node.provider_domain);
+         chart_container.appendChild(content);
+      }
+      else{
+        data = node.cc_licenses;
+        licensed_data = [] 
+        for (license in data) {
+          //build a dictionary with license as key and as value, the number of licenses
+          element = {}
+          element.name = beautifyLicensename(license.substring(1, license.length-1));
+          element.y = data[license];
+          //push that dictionary to a list
+          licensed_data.push(element)
+        }
+        
+        Highcharts.chart('pieChartContainer', {
+            exporting: {
+            showTable: false,
+            tableCaption: '<br><b>Data table</b>',
+            },
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
+            },
+            subtitle: {
+                text: 'Total licensed work: <b>'+ node.licenses_qty + '</b>'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: {point.percentage:.1f}%'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                      enabled: true,
+                      format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                      style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                      }
+                    }
+                    //showInLegend: true   
+                }
+            },
+            series: [{
+                name: 'License',
+                colorByPoint: true,
+                data: licensed_data
+            }]
+        });
+      }
+      //show the modal
       $('#pieChartModal').modal();
     }
      
@@ -97,10 +118,10 @@
       }
 
       highlightNodes.set(domain, degree);
-       /* 
+        
       Object.entries(linksPerDomains[domain] || {})
         .forEach(([targetDomain]) => traverseHighlight(targetDomain, degree + 1));
-        */
+        
     }
 
     //get width and height of the window
@@ -108,7 +129,8 @@
     h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     const MAX_FONT_SIZE = 2;
 
-    //nodes and links from a file
+    window.devicePixelRatio = 1; // use standard resolution in retina displays
+    //Start by loading nodes and links from a file
     fetch('datasets/graph_data_input_file.json').then(res => res.json()).then(data => {
 
       let hoverLink = null;
@@ -127,14 +149,18 @@
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
       .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240)')
       //.linkHoverPrecision(10)
-      .linkDirectionalArrowLength(5)
+      .zoom(0.1)
+      .d3AlphaDecay(0)
+      .d3VelocityDecay(0.08)
+      //.cooldownTicks(10000)
+      .cooldownTime(10000)
        //draw nodes
       .onNodeClick(node => drawPieChart(node))
       .nodeLabel(node => `${node.id}`)
       .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
-        var node_size = 20/2;
+        var node_size = 10;
         ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
         ctx.lineWidth = globalScale*0.03;
         ctx.fillStyle = '#3ededc'; //fill color
