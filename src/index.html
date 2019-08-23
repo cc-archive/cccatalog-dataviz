@@ -80,7 +80,7 @@
                 text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
             },
             subtitle: {
-                text: 'Total licensed work: <b>'+ node.licenses_qty + '</b>'
+                text: 'Total links to creative Commons: <b>'+ node.licenses_qty + '</b>'
             },
             tooltip: {
                 pointFormat: '{series.name}: {point.percentage:.1f}%'
@@ -124,20 +124,17 @@
         
     }
 
-    //get width and height of the window
-    //w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
     const MAX_FONT_SIZE = 2;
 
     window.devicePixelRatio = 1; // use standard resolution in retina displays
     //Start by loading nodes and links from a file
-    fetch('graph_data_input_file.json').then(res => res.json()).then(data => {
+    fetch('fdg_input_file.json').then(res => res.json()).then(data => {
 
       let hoverLink = null;
       let hoverNode = null;
       highlightNodes = new Map();
-      linksPerDomains = indexBy(data.links, ['source', 'target']);// Dual-indexed by source domain > target domain
-      //domains = new Set(data.nodes.map(i => ({ id: i , data:license_data})));
+      linksPerDomains = indexBy(data.links, ['source', 'target']);// 
 
       const elem = document.getElementById('graph');
       const Graph = ForceGraph()
@@ -149,10 +146,8 @@
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
       .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240)')
       //.linkHoverPrecision(10)
+      //.nodeCanvasObjectMode(() => 'after')
       .zoom(0.1)
-      .d3AlphaDecay(0)
-      .d3VelocityDecay(0.08)
-      .cooldownTicks(10)
       //.cooldownTime(10000)
       //.enablePointerInteraction(false)
       //.linkDirectionalArrowLength(5)
@@ -162,7 +157,7 @@
       .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
-        var node_size = 10;
+        var node_size = `${node.node_size}`;
         ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
         ctx.lineWidth = globalScale*0.03;
         ctx.fillStyle = '#3ededc'; //fill color
@@ -174,7 +169,7 @@
         const label = node.id;
         //set bounds for the labels
         const fontSize = Math.min(MAX_FONT_SIZE,globalScale*0.5);
-        ctx.font = `${fontSize}px Sans-Serif`;
+        ctx.font = "bold "+`${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea original:#279e9c
@@ -190,25 +185,7 @@
             otherGraph = traverseHighlight(node.id);
           }
         });
-       
 
-     
-     /*
-     //nodes as labels
-     .nodeCanvasObject((node, ctx, globalScale) => {
-          const label = node.id;
-          const fontSize = globalScale*0.5;
-          ctx.font = `${fontSize}px Sans-Serif`;
-          const textWidth = ctx.measureText(label).width;
-          //const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          //ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = node.color;
-          ctx.fillText(label, node.x, node.y);
-        });
-      */
     });
 
       //source: https://github.com/vasturiano/force-graph/blob/master/example/medium-graph/index.html

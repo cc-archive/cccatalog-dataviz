@@ -152,6 +152,6 @@ def toJSON(_df_nodes, _df_links):
     total_data = {"nodes":nodes_dict, "links":links_dict}
 
     #Join both lists
-    with open('graph_data_input_file.json', 'w') as file:
+    with open('../fdg_input_file.json', 'w') as file:
         file.write(json.dumps(total_data)) 
         logging.info("END")
