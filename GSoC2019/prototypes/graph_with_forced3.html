@@ -1,0 +1,125 @@
+<head>
+  <style> body { margin: 0; } </style>
+  <meta charset="utf-8"/>
+    <link rel="stylesheet" href="forced3.css" type="text/css">
+    <link rel="stylesheet" href="css/materialize.css" type="text/css">
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/highcharts.js"></script>
+    <script src="js/exporting.js"></script>
+    <script src="js/export-data.js"></script>
+    <script src="js/force-graph.min.js"></script>
+
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+  <!--<script src="../../dist/force-graph.js"></script>-->
+</head>
+
+<body>
+ 
+   <!--graph container-->
+  <div id="graph" class="visualization"></div>
+   <!--pie chart modal body-->
+  <div id="pieChartModal" class="modal">
+    <div class="modal-content" >
+      <div id="pieChartContainer"></div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      
+   </div>
+    
+  </div>
+
+  <script>
+     // use standard resolution in retina displays
+    // Random ids 
+    const N = 2000;
+    license_data = [{
+            name: 'license1',
+            y: 5,
+        }, {
+            name: 'license2',
+            y: 4
+        }, {
+            name: 'license3',
+            y: 3
+        }, {
+            name: 'license4',
+            y: 2
+        }, {
+            name: 'license5',
+            y: 3
+        }, {
+            name: 'license6',
+            y: 3
+        }];
+    function drawPieChart(node) {
+      data = node.data;
+     // Build the chart
+      Highcharts.chart('pieChartContainer', {
+          chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false,
+              type: 'pie'
+          },
+          title: {
+              text: 'Use of CC licenses by type'
+          },
+          tooltip: {
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          plotOptions: {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: false
+                  },
+                  showInLegend: true
+              }
+          },
+          series: [{
+              name: 'License',
+              colorByPoint: true,
+              data: data
+          }]
+      });
+      $('#pieChartModal').modal();
+      console.log(node);
+
+    }
+
+
+    const elem = document.getElementById('graph');
+    const gData = {
+      nodes: [...Array(N).keys()].map(i => ({ id: i , data:license_data})),
+      links: [...Array(N).keys()]
+        .filter(id => id)
+        .map(id => ({
+          source: id,
+          target: Math.round(Math.random() * (id-1))
+        }))
+    };
+    const Graph = ForceGraph()
+      (document.getElementById('graph'))
+        .backgroundColor('#101020')
+        //.enablePointerInteraction(true) //needs to be true or nodeHover and nodeClick won't work
+        .linkDirectionalParticles(0)
+        .d3AlphaDecay(0)
+        .d3VelocityDecay(0.08)
+        .warmupTicks(20)
+        .cooldownTicks(0)
+        .nodeLabel(node => `${node.id}`)
+        .linkColor(() => 'rgba(255,255,255,0.2)')
+        .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
+        .onNodeClick(node => drawPieChart(node))
+        .zoom(1)
+        .graphData(gData);
+  </script>
+</body>
