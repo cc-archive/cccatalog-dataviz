@@ -162,7 +162,6 @@
        //draw nodes
       .onNodeClick(node => drawPieChart(node))
       .nodeLabel(node => `${node.id}`)
-      .nodeCanvasObjectMode(node => 'replace')
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
         var node_size = `${node.node_size}`;

@@ -87,12 +87,6 @@ df_nodes = df.drop(columns=["links"])
 print("Nodes df with only provider domains shape")
 print(df_nodes.shape)
 
-#Get the max number of licenses to CC
-#It will be used to normalize the nodes sizes
-max_links_to_cc = df_nodes["licenses_qty"].max()
-f = open("max_links_to_cc_"+filename+".txt","w")
-f.write(str(max_links_to_cc))
-f.close()
 
 logging.info("Extracting target domains that will added to the nodes DataFrame")
 #drop duplicated target nodes
@@ -116,26 +110,3 @@ print(df_all_nodes.shape)
 #Generate the final file
 logging.info("Generating the json file")
 toJSON(df_all_nodes,df_links)
-
-
-
-
-
-
-
-
-
-
-
-"""
-#drop duplicated target nodes
-targets = df_links["target"].to_frame()
-targets.drop_duplicates(inplace=True) 
-
-#Get the target nodes that are not in the nodes dataframe
-nodes_to_concat = targets.merge(df_nodes["domain_name"], left_on="target", right_on="domain_name", how='left')
-
-#Create other df with targets, adding the required features of a node
-df_target_nodes = convert_targets_to_nodes(nodes_to_concat)
-
-"""
