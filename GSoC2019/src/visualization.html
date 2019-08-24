@@ -88,10 +88,10 @@
                 text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
             },
             subtitle: {
-                text: 'Total links to creative Commons: <b>'+ node.licenses_qty + '</b>'
+                text: 'Total links to Creative Commons: <b>'+ node.licenses_qty + '</b>'
             },
             tooltip: {
-                pointFormat: '{series.name}: {point.percentage:.1f}%'
+                pointFormat: '{series.name}: {point.percentage:.2f}%'
             },
             plotOptions: {
                 pie: {
@@ -99,7 +99,7 @@
                     cursor: 'pointer',
                     dataLabels: {
                       enabled: true,
-                      format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                      format: '<b>{point.name}</b>: {point.percentage:.2f} %',
                       style: {
                           color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                       }
