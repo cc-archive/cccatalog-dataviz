@@ -6,6 +6,9 @@
   <script src="http://unpkg.com/index-array-by"></script>
   <script src="http://unpkg.com/dat.gui@0.7.2"></script>
   <script src="http://unpkg.com/tinycolor2"></script>
+  <script src="http://unpkg.com/d3-quadtree"></script>
+  <script src="http://unpkg.com/d3-force"></script>
+
   <link rel="stylesheet" href="css/forced3.css" type="text/css">
   <script src="js/jquery-3.2.1.min.js"></script>
   <script src="js/highcharts.js"></script>
@@ -35,11 +38,6 @@
 
   <script>
 
-    function addTitle() {
-      var title_container = document.getElementById("header");
-      title_container.innerHTML = "<h1> The Big Picture</h1>";
-    }
-
     function beautifyLicensename(string){
       no_comma = string.replace(",", " v.");
       no_apostrophe = no_comma.replace(/'+/g, "");
@@ -58,7 +56,8 @@
       //if the node does not have licensed content
       if(node.provider_domain=="Domain not available"){
          var chart_container = document.getElementById("pieChartContainer");
-         var content = document.createTextNode(node.provider_domain);
+         chart_container.innerHTML = ""; 
+         var content = document.createTextNode("Domain "+node.id+" not available");
          chart_container.appendChild(content);
       }
       else{
@@ -88,7 +87,7 @@
                 text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
             },
             subtitle: {
-                text: 'Total links to Creative Commons: <b>'+ node.licenses_qty + '</b>'
+                text: 'Total links to Creative Commons: <b>'+ node.licenses_qty + '</b>'+'<br>Images on this domain: <b>'+ node.images + '</b>'
             },
             tooltip: {
                 pointFormat: '{series.name}: {point.percentage:.2f}%'
@@ -133,7 +132,9 @@
     }
 
 
-    const MAX_FONT_SIZE = 2;
+    const MAX_FONT_SIZE = 6;//0.15;
+    const ending = '...';
+    const MIN_FONT_SIZE = 0.08;
 
     window.devicePixelRatio = 1; // use standard resolution in retina displays
     //Start by loading nodes and links from a file
@@ -153,19 +154,61 @@
       .onLinkHover(link => hoverLink = link)
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 6 : 1)
       .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240)')
-      //.linkHoverPrecision(10)
-      //.nodeCanvasObjectMode(() => 'after')
-      .zoom(0.5)
-      //.cooldownTime(10000)
-      //.enablePointerInteraction(false)
-      //.linkDirectionalArrowLength(5)
+      .nodeCanvasObjectMode(() => 'replace')
+      .zoom(0.3)
+
+      //draw source and targets on the links
+      .linkCanvasObjectMode(() => 'after')
+      .linkCanvasObject((link, ctx) => {
+        const MAX_FONT_SIZE = 6;
+        const LABEL_NODE_MARGIN = Graph.nodeRelSize() * 1.5;
+        const start = link.source;
+        const end = link.target;
+        // ignore unbound links
+        if (typeof start !== 'object' || typeof end !== 'object') return;
+        // calculate label positioning
+        const textPos = Object.assign(...['x', 'y'].map(c => ({
+          [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
+        })));
+        const relLink = { x: end.x - start.x, y: end.y - start.y };
+        const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2;
+        let textAngle = Math.atan2(relLink.y, relLink.x);
+        // maintain label vertical orientation for legibility
+        if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
+        if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
+        const label = `${link.source.id} > ${link.target.id}`;
+        // estimate fontSize to fit in link length
+        ctx.font = '2px Sans-Serif';
+        const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
+        ctx.font = `${fontSize}px Sans-Serif`;
+        const textWidth = ctx.measureText(label).width;
+        const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+        // draw text label (with background rect)
+        ctx.save();
+        ctx.translate(textPos.x, textPos.y);
+        ctx.rotate(textAngle);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(- bckgDimensions[0] / 2, - bckgDimensions[1] / 2, ...bckgDimensions);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'darkgrey'; // '#E8E8E8'; // 'lightgrey';
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      })
+      
        //draw nodes
-      .onNodeClick(node => drawPieChart(node))
+      .onNodeClick(node => {
+        Graph.centerAt(node.x, node.y, 1000);
+        Graph.zoom(5, 2000);
+        drawPieChart(node);
+      })
+
       .nodeLabel(node => `${node.id}`)
       .nodeCanvasObject((node, ctx, globalScale) => {
         ctx.beginPath();
         var node_size = `${node.node_size}`;
-        ctx.arc(node.x, node.y,  node_size, 0, 2 * Math.PI, false);
+        var radius = node_size/2;
+        ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
         ctx.lineWidth = 0.5;//Math.min(globalScale*0.05,2);
         ctx.fillStyle = '#3ededc'; //fill color
         ctx.strokeStyle = '#07263b'; //border color
@@ -173,14 +216,29 @@
         ctx.stroke();
 
         //add text to nodes
-        const label = node.id;
+        var label = node.id;
+        // start with a large font size
+        /*var fontsize = Math.min(MAX_FONT_SIZE,globalScale*1.6);
+        ctx.font = "bold "+`${fontsize}em Sans-Serif`;
+        */
+        // lower the font size until the text fits the canvas
+        var fontsize = MAX_FONT_SIZE;
+        do{
+            fontsize--;
+            ctx.font = "bold "+`${fontsize}px Sans-Serif`;
+        }while(ctx.measureText(label).width > node_size)
+        if(fontsize == 0){
+          ctx.font = "bold "+"0.08em Sans-Serif";
+
+          label = label.slice(0,5)
+          label = label+ending;
+        }
         //set bounds for the labels
-        const fontSize = Math.min(MAX_FONT_SIZE,globalScale);
-        ctx.font = "bold "+`${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea original:#279e9c
+        ctx.fillStyle = '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea 
         ctx.fillText(label, node.x, node.y);
+
       })
       //highlighting neighbors
       .onNodeHover( node => {
@@ -193,11 +251,11 @@
           }
         });
 
+        Graph.d3Force('charge', null)
+        Graph.d3Force('charge', d3.forceManyBody().strength(-100));
+        Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
     });
-
-      //source: https://github.com/vasturiano/force-graph/blob/master/example/medium-graph/index.html
-      //data: https://github.com/vasturiano/force-graph/blob/master/example/datasets/blocks.json
-    addTitle();
+    
   </script>
 </body>
 </html>
