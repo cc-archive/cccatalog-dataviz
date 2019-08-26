@@ -30,9 +30,7 @@ Visit http://ec2-3-80-82-250.compute-1.amazonaws.com/
 
 ## The team
 Mentors:
-[Sophine Clachar](https://creativecommons.org/author/sclachar/)
-[Breno Ferreira](https://creativecommons.org/author/brenoferreira/)
-engineering director [Kriti Godey](https://creativecommons.org/author/kriticreativecommons-org/)
+[Sophine Clachar](https://creativecommons.org/author/sclachar/), [Breno Ferreira](https://creativecommons.org/author/brenoferreira/) and engineering director [Kriti Godey](https://creativecommons.org/author/kriticreativecommons-org/)
 
 Student:
 [María Belén Guaranda](https://github.com/soccerdroid)
