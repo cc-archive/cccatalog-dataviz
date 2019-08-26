@@ -11,8 +11,28 @@ indexed with the [CC Search project](https://search.creativecommons.org/), there
 community (and CC) to see how much data has been indexed and find and explore
 relationships between CC-licensed content on the web.
 
-The frontend app is built using [force-d3](https://github.com/vasturiano/force-graph), [Highcharts](https://www.highcharts.com) and [Bootstrap](https://getbootstrap.com/).
+The frontend app is built using [force-graph](https://github.com/vasturiano/force-graph), [Highcharts](https://www.highcharts.com) and [Bootstrap](https://getbootstrap.com/).
 
-## Getting Started
+## Repository structure
 
-Just access to the home.html file in Firefox browser (in Chrome there is a restriction for accessing files only through HTTP or HTTPS).
+Everything is inside the GSoC2019/src folder.
+ - index.html: main file. It displays the same web page as in Visualization in production.
+ - visualization.html : file that renders the graph. It contains the js script that builds the graph.
+ - js folder: contains the required dependencies for the correct visualization of the graph.
+ - css folder: styling files. 
+ 
+## Local deploy
+
+Just access to the home.html file in Firefox browser (in Chrome there is a restriction that requires accessing files only through HTTP or HTTPS).
+
+## Visualization in production
+Visit http://ec2-3-80-82-250.compute-1.amazonaws.com/ 
+
+## The team
+Mentors:
+[Sophine Clachar](https://creativecommons.org/author/sclachar/)
+[Breno Ferreira](https://creativecommons.org/author/brenoferreira/)
+engineering director [Kriti Godey](https://creativecommons.org/author/kriticreativecommons-org/)
+
+Student:
+[María Belén Guaranda](https://github.com/soccerdroid)
