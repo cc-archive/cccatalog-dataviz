@@ -1,0 +1,233 @@
+<html>
+  <head>
+  
+  <meta charset="utf-8"/>
+  <!--<script src="js/force-graph.min.js"></script> -->
+  <script src="//unpkg.com/three"></script>
+  <script src="//unpkg.com/three-spritetext"></script>
+
+  <script src="//unpkg.com/3d-force-graph"></script>
+  <script src="//unpkg.com/d3-octree"></script>
+  <script src="//unpkg.com/d3-force-3d"></script>
+  <script src="http://unpkg.com/index-array-by"></script>
+  <script src="http://unpkg.com/dat.gui@0.7.2"></script>
+  <script src="http://unpkg.com/tinycolor2"></script>
+
+  <link rel="stylesheet" href="css/forced3.css" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
+  <script src="js/export-data.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="css/materialize.css" type="text/css">
+</head>
+
+<body>
+  <div class="pos-f-t">
+  <div class="collapse" id="navbarToggleExternalContent">
+    <div class="bg-info p-4">
+      <p class="text-white">This graph visualizes the relationships between domains that use Creative Commons licenses. For more information and to view the code, view the <a class='text-warning' href='https://github.com/creativecommons/cccatalog-dataviz/tree/master/GSoC2019' target='_blank'>CC Catalog Data Viz</a> repo on Github</p>
+      <span class="text-muted">This is a Google Summer of Code 2019 project by: <a class='text-warning' href='https://github.com/soccerdroid' target='_blank'>Mar&iacutea-Bel&eacuten Guaranda</a>. <br/>Mentors: Sophine Clachar and Breno Ferreira.</span>
+    </div>
+  </div>
+  <nav class="navbar navbar-dark bg-info">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="#">The Linked Commons</a>
+  </nav>
+</div>
+  <div id="graph" >
+    <div id="header"></div>
+  </div>
+
+    <div id="pieChartModal" class="modal">
+      <div class="modal-content" >
+        <div id="pieChartContainer"></div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+     </div>
+    </div>
+
+
+  <script>
+
+    function beautifyLicensename(string){
+      no_comma = string.replace(",", " ");
+      no_apostrophe = no_comma.replace(/'+/g, "");
+      if(no_apostrophe.substring(0,2)=="by"){
+        final_name = "cc "+ no_apostrophe;
+      }
+      else{
+        final_name = no_apostrophe;
+      }
+      return final_name;
+
+    }
+    function drawPieChart(node) {
+      //function for rendering the pie chart inside a modal
+
+      //if the node does not have licensed content
+      if(node.provider_domain=="Domain not available"){
+         var chart_container = document.getElementById("pieChartContainer");
+         chart_container.innerHTML = ""; 
+         var content = document.createTextNode("Domain "+node.id+" not available");
+         chart_container.appendChild(content);
+      }
+      else{
+        data = node.cc_licenses;
+        licensed_data = [] 
+        for (license in data) {
+          //build a dictionary with license as key and as value, the number of licenses
+          element = {}
+          element.name = beautifyLicensename(license.substring(1, license.length-1));
+          element.y = data[license];
+          //push that dictionary to a list
+          licensed_data.push(element)
+        }
+        
+        Highcharts.chart('pieChartContainer', {
+            exporting: {
+            showTable: false,
+            tableCaption: '<br><b>Data table</b>',
+            },
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
+            },
+            subtitle: {
+                text: 'Total links to Creative Commons: <b>'+ node.licenses_qty + '</b>'+'<br>Images on this domain: <b>'+ node.images + '</b>'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: {point.percentage:.2f}%'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                      enabled: true,
+                      format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                      style: {
+                          color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                      }
+                    }
+                    //showInLegend: true   
+                }
+            },
+            series: [{
+                name: 'License',
+                colorByPoint: true,
+                data: licensed_data
+            }]
+        });
+      }
+      //show the modal
+      $('#pieChartModal').modal();
+    }
+     
+
+    window.devicePixelRatio = 1; // use standard resolution in retina displays
+    //Start by loading nodes and links from a file
+    fetch('fdg_input_file.json').then(res => res.json()).then(data => {
+
+      let hoverLink = null;
+      let hoverNode = null;
+      highlightNodes = new Map();
+      let highlightLink = null;
+      linksPerDomains = indexBy(data.links, ['source', 'target']);// 
+
+      const elem = document.getElementById('graph');
+      const Graph = ForceGraph3D()
+      (elem)
+      .backgroundColor('#07263b') 
+      .graphData(data)
+
+      .nodeLabel('id')
+      .nodeResolution(20)
+      .nodeThreeObject(node => {
+            // use a sphere as a drag handle
+            const obj = new THREE.Mesh(
+            new THREE.SphereGeometry(node.node_size/2, 12, 12),
+            new THREE.MeshLambertMaterial({ depthWrite: false, transparent: true, color: node.grp_color}) //Math.round(Math.random() * Math.pow(2, 24))
+          );
+
+          // add text sprite as child
+          const sprite = new SpriteText(node.id);
+          sprite.color =  'darkgrey';//'dodgerblue';//node.color;
+          sprite.textHeight = 8;
+          obj.add(sprite);
+          return obj;
+       })
+
+      .linkColor(link => link.color ? 'white' : 'rgb(155, 216, 240, 0.1)' )
+      //.linkWidth(link => link.id === highlightLink ? 2 : 1)
+      .linkThreeObjectExtend(true)
+      .linkThreeObject(link => {
+          // extend link with text sprite
+          const sprite = new SpriteText(`${link.source} > ${link.target}`);
+          sprite.color = 'darkgrey';
+          sprite.textHeight = 1.5;
+          return sprite;
+       })
+       .linkPositionUpdate((sprite, { start, end }) => {
+          const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
+            [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
+          })));
+          // Position sprite
+          Object.assign(sprite.position, middlePos);
+        })
+
+
+/*	.onNodeHover(node => {
+	   if (node) {
+		console.log(node.id) 
+		console.log(linksPerDomains[node.id])
+		Object.entries(linksPerDomains[node.id] || {})
+		.forEach(([targetDomain]) =>{ 
+		  console.log(targetDomain) 
+		  highlightLink = targetDomain;
+		});
+        
+    		}
+        })
+*/
+
+       //draw pie chart on node click and focus on the node
+      .onNodeClick(node => {
+          const distance = 200;
+          const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+          Graph.cameraPosition(
+            { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+            node, // lookAt ({ x, y, z })
+            3000  // ms transition duration
+          );
+
+        drawPieChart(node);
+      })
+
+	.d3Force('center', null)
+        // Spread nodes a little wider
+        Graph.d3Force('charge').strength(-100)
+
+
+	/*Graph.d3Force('center', null);
+	Graph.d3Force('collide', d3.forceCollide(node => {
+		// node sphere collision
+		return Math.cbrt(node.node_size * 0.005) * 2;
+	}));*/
+
+    });
+
+    
+  </script>
+</body>
+</html>
