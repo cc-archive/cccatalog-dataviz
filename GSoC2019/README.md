@@ -13,21 +13,19 @@ The frontend app is built using [force-graph](https://github.com/vasturiano/forc
 ## Repository structure
 
 Everything is inside the src folder.
- - index.html: main file. It displays the same web page as in Visualization in production.
- - visualization.html : file that renders the graph. It contains the js script that builds the graph.
+ - index.html: is the main file. It displays the same web page as in [Visualization in production](#visualization-in-production) and it contains the js script that builds the graph.
+ - visualization_3d.html: renders the graph in 3D. 
  - js folder: contains the required dependencies for the correct visualization of the graph.
  - css folder: styling files. 
  
 ## Local deploy
 
-Just access to the home.html file in Firefox browser (in Chrome there is a restriction that requires accessing files only through HTTP or HTTPS).
+Just access the index.html file in Firefox browser (in Chrome there is a restriction that requires accessing files only through HTTP or HTTPS).
 
 ## Visualization in production
-Visit http://ec2-3-80-82-250.compute-1.amazonaws.com/ 
+Visit the production website to view a demo of the force-directed graph in [2D](http://ec2-3-80-82-250.compute-1.amazonaws.com/) or [3D](http://ec2-3-80-82-250.compute-1.amazonaws.com/visualization_3d.html).
 
 ## The team
-Mentors:
-[Sophine Clachar](https://creativecommons.org/author/sclachar/), [Breno Ferreira](https://creativecommons.org/author/brenoferreira/) and engineering director [Kriti Godey](https://creativecommons.org/author/kriticreativecommons-org/)
+Student: [María Belén Guaranda](https://github.com/soccerdroid)
 
-Student:
-[María Belén Guaranda](https://github.com/soccerdroid)
+Mentors: [Sophine Clachar](https://creativecommons.org/author/sclachar/), [Breno Ferreira](https://creativecommons.org/author/brenoferreira/) and engineering director [Kriti Godey](https://creativecommons.org/author/kriticreativecommons-org/)
