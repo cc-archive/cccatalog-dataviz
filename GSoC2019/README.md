@@ -9,6 +9,11 @@ The frontend app is built using [force-graph](https://github.com/vasturiano/forc
 ## Project Report
 
 ## Blog Post
+- [Visualize CC Catalog data](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-visualization/)
+- [Visualize CC Catalog data - data processing](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-data-processing/)
+- [Visualize CC Catalog data - data processing part 2](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-data-processing-2/)
+- [Visualize CC Catalog data - data processing part 3](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-data-processing-3/)
+- [The Linked Commons graph: the final vis](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-data-thelinkedcommons/)
 
 ## Repository structure
 
