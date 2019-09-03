@@ -7,6 +7,7 @@ relationships between CC-licensed content on the web.
 The frontend app is built using [force-graph](https://github.com/vasturiano/force-graph), [Highcharts](https://www.highcharts.com) and [Bootstrap](https://getbootstrap.com/).
 
 ## Project Report
+Technical details can be found in the [project report](https://github.com/creativecommons/cccatalog-dataviz/blob/master/GSoC2019/GSoC2019-Project-Report.pdf)
 
 ## Blog Post
 - [Visualize CC Catalog data](https://opensource.creativecommons.org/blog/entries/cc-datacatalog-visualization/)
