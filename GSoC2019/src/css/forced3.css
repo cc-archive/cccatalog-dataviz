@@ -19,7 +19,6 @@
 .modal-content{
 	min-width: 100%;
 	min-height: 100%;
-  	padding: 0px;
 }
 
 .highcharts-title .tspan:nth-child(2){
@@ -28,5 +27,5 @@
 
 #pieChartModal{
   padding-right: 0px !important;
-	overflow: scroll;
+	overflow-y: scroll;
 }
