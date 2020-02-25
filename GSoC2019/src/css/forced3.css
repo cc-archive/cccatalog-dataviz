@@ -16,10 +16,17 @@
   position: fixed;
 }
 
+.modal-content{
+	min-width: 100%;
+	min-height: 100%;
+  	padding: 0px;
+}
+
 .highcharts-title .tspan:nth-child(2){
 	font-weight: bold;
 }
 
 #pieChartModal{
-	overflow: visible;
+  padding-right: 0px !important;
+	overflow: scroll;
 }
