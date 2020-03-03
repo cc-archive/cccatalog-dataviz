@@ -20,10 +20,16 @@ body{
   position: fixed;
 }
 
+.modal-content{
+	min-width: 100%;
+	min-height: 100%;
+}
+
 .highcharts-title .tspan:nth-child(2){
 	font-weight: bold;
 }
 
 #pieChartModal{
-	overflow: visible;
+  padding-right: 0px !important;
+	overflow-y: scroll;
 }

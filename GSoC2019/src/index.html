@@ -1,6 +1,6 @@
 <html>
   <head>
-  
+
   <meta charset="utf-8"/>
   <script src="js/force-graph.min.js"></script>
   <script src="http://unpkg.com/index-array-by"></script>
@@ -35,7 +35,7 @@
     </button>
     <a class="navbar-brand" href="#">The Linked Commons</a>
   </nav>
-</div> 
+</div>
   <div id="graph" class="visualization" >
     <div id="header"></div>
   </div>
@@ -44,7 +44,7 @@
       <div class="modal-content" >
         <div id="pieChartContainer"></div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
      </div>
     </div>
@@ -70,13 +70,13 @@
       //if the node does not have licensed content
       if(node.provider_domain=="Domain not available"){
          var chart_container = document.getElementById("pieChartContainer");
-         chart_container.innerHTML = ""; 
+         chart_container.innerHTML = "";
          var content = document.createTextNode("The CC License information of "+node.id+" is not available");
          chart_container.appendChild(content);
       }
       else{
         data = node.cc_licenses;
-        licensed_data = [] 
+        licensed_data = []
         for (license in data) {
           //build a dictionary with license as key and as value, the number of licenses
           element = {}
@@ -85,7 +85,7 @@
           //push that dictionary to a list
           licensed_data.push(element)
         }
-        
+
         Highcharts.chart('pieChartContainer', {
             exporting: {
             showTable: false,
@@ -117,7 +117,7 @@
                           color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                       }
                     }
-                    //showInLegend: true   
+                    //showInLegend: true
                 }
             },
             series: [{
@@ -129,8 +129,12 @@
       }
       //show the modal
       $('#pieChartModal').modal();
+        //Event listner to close the modal when user clicks outside the modal area
+        document.querySelector('.modal-backdrop').addEventListener("click",function () {
+        document.querySelector('#closeBtn').click();
+      });
     }
-     
+
     function traverseHighlight(domain, degree = -1) {
       if (!domain) return;
       if (highlightNodes.has(domain)) { // already been here
@@ -139,10 +143,10 @@
       }
 
       highlightNodes.set(domain, degree);
-        
+
       Object.entries(linksPerDomains[domain] || {})
         .forEach(([targetDomain]) => traverseHighlight(targetDomain, degree + 1));
-        
+
     }
 
 
@@ -157,7 +161,7 @@
       let hoverLink = null;
       let hoverNode = null;
       highlightNodes = new Map();
-      linksPerDomains = indexBy(data.links, ['source', 'target']);// 
+      linksPerDomains = indexBy(data.links, ['source', 'target']);//
 
       const elem = document.getElementById('graph');
       const Graph = ForceGraph()
@@ -209,7 +213,7 @@
         ctx.fillText(label, 0, 0);
         ctx.restore();
       })
-      
+
        //draw nodes
       .onNodeClick(node => {
         Graph.centerAt(node.x, node.y, 1000);
@@ -250,7 +254,7 @@
         //set bounds for the labels
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#D3D3D3'; // '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea 
+        ctx.fillStyle = '#D3D3D3'; // '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea
         ctx.fillText(label, node.x, node.y);
 
       })
@@ -269,7 +273,7 @@
         Graph.d3Force('charge', d3.forceManyBody().strength(-120));
         Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
     });
-    
+
   </script>
 </body>
 </html>
