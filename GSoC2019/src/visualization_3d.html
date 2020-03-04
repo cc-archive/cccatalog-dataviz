@@ -1,6 +1,6 @@
 <html>
   <head>
-  
+
   <meta charset="utf-8"/>
   <!--<script src="js/force-graph.min.js"></script> -->
   <script src="//unpkg.com/three"></script>
@@ -73,13 +73,13 @@
       //if the node does not have licensed content
       if(node.provider_domain=="Domain not available"){
          var chart_container = document.getElementById("pieChartContainer");
-         chart_container.innerHTML = ""; 
+         chart_container.innerHTML = "";
          var content = document.createTextNode("The CC License information of "+node.id+" is not available");
          chart_container.appendChild(content);
       }
       else{
         data = node.cc_licenses;
-        licensed_data = [] 
+        licensed_data = []
         for (license in data) {
           //build a dictionary with license as key and as value, the number of licenses
           element = {}
@@ -88,7 +88,7 @@
           //push that dictionary to a list
           licensed_data.push(element)
         }
-        
+
         Highcharts.chart('pieChartContainer', {
             exporting: {
             showTable: false,
@@ -120,7 +120,7 @@
                           color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                       }
                     }
-                    //showInLegend: true   
+                    //showInLegend: true
                 }
             },
             series: [{
@@ -132,8 +132,12 @@
       }
       //show the modal
       $('#pieChartModal').modal();
+      //Event listner to close the modal when user clicks outside the modal area
+        document.querySelector('.modal-backdrop').addEventListener("click",function () {
+        document.querySelector('#closeBtn').click();
+      });
     }
-     
+
 
     window.devicePixelRatio = 1; // use standard resolution in retina displays
     //Start by loading nodes and links from a file
@@ -143,12 +147,12 @@
       let hoverNode = null;
       highlightNodes = new Map();
       let highlightLink = null;
-      linksPerDomains = indexBy(data.links, ['source', 'target']);// 
+      linksPerDomains = indexBy(data.links, ['source', 'target']);//
 
       const elem = document.getElementById('graph');
       const Graph = ForceGraph3D()
       (elem)
-      .backgroundColor('#07263b') 
+      .backgroundColor('#07263b')
       .graphData(data)
 
       .nodeLabel('id')
@@ -189,14 +193,14 @@
 
 /*	.onNodeHover(node => {
 	   if (node) {
-		console.log(node.id) 
+		console.log(node.id)
 		console.log(linksPerDomains[node.id])
 		Object.entries(linksPerDomains[node.id] || {})
-		.forEach(([targetDomain]) =>{ 
-		  console.log(targetDomain) 
+		.forEach(([targetDomain]) =>{
+		  console.log(targetDomain)
 		  highlightLink = targetDomain;
 		});
-        
+
     		}
         })
 */
@@ -227,7 +231,7 @@
 
     });
 
-    
+
   </script>
 </body>
 </html>
