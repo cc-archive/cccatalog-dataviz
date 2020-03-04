@@ -1,8 +1,5 @@
-# Google Summer of Code (GSoC) 2019
-There is no larger compendium of shared human knowledge and creativity than the Commons, including over 1.4 billion digital works available under CC tools. Although a huge amount of CC-licensed content has been
-indexed with the [CC Search project](https://search.creativecommons.org/), there is still not a way of conveying the scale of this work to thecommunity. Being able to access visualizations of all the indexed content is a good way for the
-community (and CC) to see how much data has been indexed and find and explore
-relationships between CC-licensed content on the web.
+# The Linked Commons
+There is no larger compendium of shared human knowledge and creativity than the Commons, including over 1.4 billion digital works available under CC tools. Although a huge amount of CC-licensed content has been indexed with the [CC Search project](https://search.creativecommons.org/), there is still not a way of conveying the scale of this work to the community. Being able to access visualizations of all the indexed content is a good way for the community (and CC) to see how much data has been indexed and find and explore relationships between CC-licensed content on the web.
 
 The frontend app is built using [force-graph](https://github.com/vasturiano/force-graph), [Highcharts](https://www.highcharts.com) and [Bootstrap](https://getbootstrap.com/).
 
@@ -26,10 +23,14 @@ Everything is inside the src folder.
  
 ## Local deploy
 
-Just access the index.html file in Firefox browser (in Chrome there is a restriction that requires accessing files only through HTTP or HTTPS).
+The files can be hosted locally by running the following command in the `GSoC2019/src` folder.
+```
+python -m http.server 4000
+```
+The visualization can be found by navigating to http://localhost:4000/ in the browser.
 
-## Visualization in production
-Visit the production website to view a demo of the force-directed graph in [2D](http://ec2-3-80-82-250.compute-1.amazonaws.com/) or [3D](http://ec2-3-80-82-250.compute-1.amazonaws.com/visualization_3d.html).
+## Demos
+Visit the demo websites of the force-directed graph in [2D](http://dataviz.creativecommons.engineering/) or [3D](http://dataviz.creativecommons.engineering/visualization_3d.html).
 
 ## The team
 Student: [María Belén Guaranda](https://github.com/soccerdroid)
