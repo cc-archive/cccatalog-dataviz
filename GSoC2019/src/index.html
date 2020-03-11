@@ -2,6 +2,7 @@
   <head>
 
   <meta charset="utf-8"/>
+  
   <script src="js/force-graph.min.js"></script>
   <script src="http://unpkg.com/index-array-by"></script>
   <script src="http://unpkg.com/dat.gui@0.7.2"></script>
@@ -10,15 +11,38 @@
   <script src="http://unpkg.com/d3-force"></script>
 
   <link rel="stylesheet" href="css/forced3.css" type="text/css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  
   <script src="js/jquery-3.2.1.min.js"></script>
   <script src="js/highcharts.js"></script>
   <script src="js/exporting.js"></script>
   <script src="js/export-data.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="css/materialize.css" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="css/materialize.css" type="text/css">
   <!--<script src="../../dist/force-graph.js"></script>-->
+  
+  <!--Jquery-->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">  
+  <script src="https://code.jquery.com/jquery-3.4.1.js"></script>  
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
+
+  <!-- Graph Filter JS -->
+  <script src="js/filter.js"></script>
+
+  <!-- Autocomplete feature -->
+  <script type="text/javascript">
+  	$(function(){  
+  		var availableTags = Id;
+  		$("#myFilterInput").autocomplete({  
+    		source: availableTags  
+  		});  
+	});
+  </script>
+
 </head>
 
 <body>
@@ -35,6 +59,38 @@
     </button>
     <a class="navbar-brand" href="#">The Linked Commons</a>
   </nav>
+
+
+  <!-- Filter selecter menu -->
+  <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <div class="autocomplete">
+            <input id="myFilterInput" type="text" name="filteredId" placeholder="Filter by domain">
+          </div>
+        </div>
+        <div class="col">
+          <button onclick="plotGraph()"style="float: left;margin-top: 14px;" class="btn btn-lg btn-primary">Plot Graph</button>
+        </div>
+        <div class="col">
+          <div class="input-group mb-3" style="margin-top: 14px;">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputGroupSelect01">Select Distance</label>
+            </div>
+            <select class="custom-select" id="depth">
+              <option selected>Choose...</option>
+              <option value=1>1</option>
+              <option value=2>2</option>
+              <option value=3>3</option>
+              <option value=4>4</option>
+              <option value=5>5</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 </div>
   <div id="graph" class="visualization" >
     <div id="header"></div>
@@ -127,6 +183,7 @@
             }]
         });
       }
+
       //show the modal
       $('#pieChartModal').modal();
         //Event listner to close the modal when user clicks outside the modal area
@@ -149,133 +206,20 @@
 
     }
 
-
-    const MAX_FONT_SIZE = 6;//0.15;
-    const ending = '...';
-    const MIN_FONT_SIZE = 0.08;
-
-    window.devicePixelRatio = 1; // use standard resolution in retina displays
-    //Start by loading nodes and links from a file
+    // Fetching data from json file as user session starts and create a graph data structure
     fetch('fdg_input_file.json').then(res => res.json()).then(data => {
-
-      let hoverLink = null;
-      let hoverNode = null;
-      highlightNodes = new Map();
-      linksPerDomains = indexBy(data.links, ['source', 'target']);//
-
-      const elem = document.getElementById('graph');
-      const Graph = ForceGraph()
-      (elem)
-      .backgroundColor('#07263b')
-      .graphData(data)
-      // links
-      .onLinkHover(link => hoverLink = link)
-      .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 2 : 1)
-      .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)')
-      .nodeCanvasObjectMode(() => 'replace')
-      .zoom(0.05)
-
-      //draw source and targets on the links
-      .linkCanvasObjectMode(() => 'after')
-      .linkCanvasObject((link, ctx) => {
-        const MAX_FONT_SIZE = 6;
-        const LABEL_NODE_MARGIN = Graph.nodeRelSize() * 1.5;
-        const start = link.source;
-        const end = link.target;
-        // ignore unbound links
-        if (typeof start !== 'object' || typeof end !== 'object') return;
-        // calculate label positioning
-        const textPos = Object.assign(...['x', 'y'].map(c => ({
-          [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
-        })));
-        const relLink = { x: end.x - start.x, y: end.y - start.y };
-        const maxTextLength = Math.sqrt(Math.pow(relLink.x, 2) + Math.pow(relLink.y, 2)) - LABEL_NODE_MARGIN * 2;
-        let textAngle = Math.atan2(relLink.y, relLink.x);
-        // maintain label vertical orientation for legibility
-        if (textAngle > Math.PI / 2) textAngle = -(Math.PI - textAngle);
-        if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
-        const label = `${link.source.id} > ${link.target.id}`;
-        // estimate fontSize to fit in link length
-        ctx.font = '2px Sans-Serif';
-        const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
-        ctx.font = `${fontSize}px Sans-Serif`;
-        const textWidth = ctx.measureText(label).width;
-        const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-        // draw text label (with background rect)
-        ctx.save();
-        ctx.translate(textPos.x, textPos.y);
-        ctx.rotate(textAngle);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        ctx.fillRect(- bckgDimensions[0] / 2, - bckgDimensions[1] / 2, ...bckgDimensions);
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'lightgrey'; // '#C8C8C8'; // '#E8E8E8'; // 'lightgrey';
-        ctx.fillText(label, 0, 0);
-        ctx.restore();
-      })
-
-       //draw nodes
-      .onNodeClick(node => {
-        Graph.centerAt(node.x, node.y, 1000);
-        Graph.zoom(5, 2000);
-        drawPieChart(node);
-      })
-
-      .nodeLabel(node => `${node.id}`)
-      .nodeCanvasObject((node, ctx, globalScale) => {
-        ctx.beginPath();
-        var node_size = `${node.node_size}`;
-        var radius = node_size/2;
-        ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-        ctx.lineWidth = 0.5;//Math.min(globalScale*0.05,2);
-        ctx.fillStyle = '#32B2B0'; //fill color
-        ctx.strokeStyle = '#07263b'; //border color
-        ctx.fill();
-        ctx.stroke();
-
-        //add text to nodes
-        var label = node.id;
-        // start with a large font size
-        /*var fontsize = Math.min(MAX_FONT_SIZE,globalScale*1.6);
-        ctx.font = "bold "+`${fontsize}em Sans-Serif`;
-        */
-        ctx.font = `bold 1px Sans-Serif`; //First set the font size to be 1
-        let fontsize = Math.floor(node_size / ctx.measureText(label).width +0.5);  //Check the no. of times the font size should be enlarged compared to 1px
-        if(fontsize <=1){  //If the whole text can't be displayed
-          label = label.slice(0,5)
-          label = label+ending;
-          fontsize = Math.floor(node_size / ctx.measureText(label).width +0.5);
+        noOfNodes = data["nodes"].length;
+        noOfEdges = data["links"].length;
+        for(var i=0;i<noOfNodes;i++){
+          Id.push(data["nodes"][i]["id"]);
+          nodesMap.set(data["nodes"][i]["id"],data["nodes"][i]);
+          G.addVertex(data["nodes"][i]);
+        }      
+        for(var i=0;i<noOfEdges;i++){
+          G.addEdge(nodesMap.get(data["links"][i]["source"]),nodesMap.get(data["links"][i]["target"]),data["links"][i]["value"]);
         }
-        //Wrapping up the text inside the node with some logic based on node size and text length
-          if(fontsize>=5 && node.node_size>70 && node.id.length <=5)
-            fontsize -= 5;
-          else if(fontsize>=3 && node.node_size>70)
-            fontsize -= 3;
-          else
-            fontsize--;
-        ctx.font = fontsize>1?"bold "+`${fontsize}px Sans-Serif`:"bold 0.08em Sans-Serif";
-        //set bounds for the labels
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#D3D3D3'; // '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea
-        ctx.fillText(label, node.x, node.y);
-
-      })
-      //highlighting neighbors
-      .onNodeHover( node => {
-          hoverNode = node;
-          elem.style.cursor = node ? 'pointer' : null;
-
-          highlightNodes.clear();
-          if (node) {
-            otherGraph = traverseHighlight(node.id);
-          }
-        });
-
-        Graph.d3Force('charge', null)
-        Graph.d3Force('charge', d3.forceManyBody().strength(-120));
-        Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
-    });
+        console.log(G);
+      });
 
   </script>
 </body>
