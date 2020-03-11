@@ -1,4 +1,4 @@
-I added one new file "js/filter.js" and make changes in existing file "index.html". 
+I added one new file "js/filter.js" and made changes in the existing file "index.html". 
 
 **Changes in index.html
 
@@ -9,7 +9,7 @@ I added one new file "js/filter.js" and make changes in existing file "index.htm
   <script src="https://code.jquery.com/jquery-3.4.1.js"></script>  
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-2. Added one div tag which will use to provide the filter options by domain name and distance (1 to 5).
+2. Added one div tag which will be used to provide the filter options by domain name and distance (1 to 5).
 
 3. Transfer the logic of graph plotting to another file. (filter.js)
 
@@ -22,7 +22,6 @@ I added one new file "js/filter.js" and make changes in existing file "index.htm
 
    Graph : Data Structure use to create adjacency list and instead loading
    Json file everytime, it will load it once and store whole data into that graph 
-   data structure and that data structure will use to solve further queries.
+   data structure and that data structure will be used to solve further queries.
 
 2. Added Implementation of BFS.
-   
