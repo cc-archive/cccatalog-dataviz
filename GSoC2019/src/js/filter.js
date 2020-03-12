@@ -1,28 +1,23 @@
 // Queue Data Structure (Use for BFS traversal with first in first out (FIFO) rule)
 class Queue{
-
   //Initialize a queue
   constructor(){
     this.items = [];
   }
-  
   //Push element in the queue
   enqueue(element){
     this.items.push(element);
   }
-
   //Remove element from the queue
   dequeue(){
     if(this.isEmpty())return -1;
     return this.items.shift();
   }
-
   //Get the front element from the queue (FIFO rule)
   front(){
     if(this.isEmpty())return -1;
     return this.items[0];
   }
-
   //Check if queue is empty or not.
   isEmpty(){
     return this.items.length==0;
@@ -246,18 +241,21 @@ function plotGraph(){
       /*var fontsize = Math.min(MAX_FONT_SIZE,globalScale*1.6);
       ctx.font = "bold "+`${fontsize}em Sans-Serif`;
       */
-      // lower the font size until the text fits the canvas
-      var fontsize = MAX_FONT_SIZE;
-      do{
-          fontsize--;
-          ctx.font = "bold "+`${fontsize}px Sans-Serif`;
-      }while(ctx.measureText(label).width > node_size)
-      if(fontsize == 0){
-        ctx.font = "bold "+"0.08em Sans-Serif";
-
+      ctx.font = `bold 1px Sans-Serif`; //First set the font size to be 1
+      let fontsize = Math.floor(node_size / ctx.measureText(label).width +0.5);  //Check the no. of times the font size should be enlarged compared to 1px
+      if(fontsize <=1){  //If the whole text can't be displayed
         label = label.slice(0,5)
         label = label+ending;
+        fontsize = Math.floor(node_size / ctx.measureText(label).width +0.5);
       }
+      //Wrapping up the text inside the node with some logic based on node size and text length
+        if(fontsize>=5 && node.node_size>70 && node.id.length <=5)
+          fontsize -= 5;
+        else if(fontsize>=3 && node.node_size>70)
+          fontsize -= 3;
+        else
+          fontsize--;
+      ctx.font = fontsize>1?"bold "+`${fontsize}px Sans-Serif`:"bold 0.08em Sans-Serif";
       //set bounds for the labels
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
