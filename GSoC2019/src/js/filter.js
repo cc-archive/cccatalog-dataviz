@@ -64,94 +64,9 @@ function validId(id){
   return false;
 }
 
-function plotGraph(){
 
-  //This two array will provided to data object for d3-force graph
-  var nodesList = new Array();
-  var linksList = new Array();
-  
-  // User filter query depth and domain-id
-  var depth = document.getElementById("depth").value;
-  var id = document.getElementById("myFilterInput").value;
-  
-  if(depth!="Choose..."){
-    //converting string value to int.
-    depth = parseInt(depth);  
-  }
-  else{
-    //If depth is not given then visit till leaf nodes.
-    var MAXIMUM_DEPTH = 100;
-    depth = MAXIMUM_DEPTH;
-  }
-
-  if(validId(id)){
-      
-    var links = new Array();
-    var nodes = new Array();
-
-    var iteratorObj = nodesMap.entries();
-
-    var visited = new Map();
-    var depthList = new Map();
-    
-    //Initialise depth list to -1 and visited to false.
-    for(var i=0;i<noOfNodes;i++){
-      var nodeId = iteratorObj.next().value[0];
-      visited.set(nodeId,false);
-      depthList.set(nodeId,-1);
-    }
-
-    //First visited the queried domain then push it into queue and assign depth to 0.
-    visited.set(id,true);
-    var q = new Queue();
-    q.enqueue(nodesMap.get(id));
-    depthList.set(id,0);      
-
-    while(!q.isEmpty()){
-      
-      node = q.front();  
-
-      // Checking the distance travel for each node if it goes beyond depth then terminate (BFS).
-      if(depthList.get(node["id"])>depth)break;
-
-      nodesList.push(node);
-      q.dequeue();
-      
-      // Traverse all the neighbours of "node" which is currently visited.
-      get_List = G.AdjList.get(node);
-      for(i=0 ;i<get_List.length;i++){
-        
-        var neigh = get_List[i][0];
-        var weight = get_List[i][1];
-
-        // Checking if particular node is already visited or not.
-        if(!visited.get(neigh["id"])){
-          
-          visited.set(neigh["id"],true);
-          q.enqueue(neigh);
-          depthList.set(neigh["id"],depthList.get(node["id"])+1);
-
-          if(depthList.get(neigh["id"])<=depth){
-            var dataMap = {
-              source : node,
-              target : neigh,
-              value : weight
-            };
-            linksList.push(dataMap);
-          }
-
-        }
-      }
-    }
-    
-    // creating an object using BFS for plotting visual.
-    var data = {
-      nodes : nodesList,
-      links : linksList
-    }
-
-    // Data is provided to d3force graph for further plotting.
-    console.log(data);
+function plotGraph(data){
+   
     const MAX_FONT_SIZE = 6;//0.15;
     const ending = '...';
     const MIN_FONT_SIZE = 0.08;
@@ -277,8 +192,101 @@ function plotGraph(){
       Graph.d3Force('charge', null)
       Graph.d3Force('charge', d3.forceManyBody().strength(-120));
       Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
+}
+
+
+function filterGraph(){
+  //This two array will provided to data object for d3-force graph
+  var nodesList = new Array();
+  var linksList = new Array();
+  
+  // User filter query depth and domain-id
+  var depth = document.getElementById("depth").value;
+  var id = document.getElementById("myFilterInput").value;
+  
+  if(depth!="Choose..."){
+    //converting string value to int.
+    depth = parseInt(depth);  
   }
   else{
-      alert("Select valid domain !");
+    //If depth is not given then visit till leaf nodes.
+    var MAXIMUM_DEPTH = 100;
+    depth = MAXIMUM_DEPTH;
+  }
+
+  if(validId(id)){
+      
+    var links = new Array();
+    var nodes = new Array();
+
+    var iteratorObj = nodesMap.entries();
+
+    var visited = new Map();
+    var depthList = new Map();
+    
+    //Initialise depth list to -1 and visited to false.
+    for(var i=0;i<noOfNodes;i++){
+      var nodeId = iteratorObj.next().value[0];
+      visited.set(nodeId,false);
+      depthList.set(nodeId,-1);
+    }
+
+    //First visited the queried domain then push it into queue and assign depth to 0.
+    visited.set(id,true);
+    var q = new Queue();
+    q.enqueue(nodesMap.get(id));
+    depthList.set(id,0);      
+
+    while(!q.isEmpty()){
+      
+      node = q.front();  
+
+      // Checking the distance travel for each node if it goes beyond depth then terminate (BFS).
+      if(depthList.get(node["id"])>depth)break;
+
+      nodesList.push(node);
+      q.dequeue();
+      
+      // Traverse all the neighbours of "node" which is currently visited.
+      get_List = G.AdjList.get(node);
+      for(i=0 ;i<get_List.length;i++){
+        
+        var neigh = get_List[i][0];
+        var weight = get_List[i][1];
+
+        // Checking if particular node is already visited or not.
+        if(!visited.get(neigh["id"])){
+          
+          visited.set(neigh["id"],true);
+          q.enqueue(neigh);
+          depthList.set(neigh["id"],depthList.get(node["id"])+1);
+
+          if(depthList.get(neigh["id"])<=depth){
+            var dataMap = {
+              source : node,
+              target : neigh,
+              value : weight
+            };
+            linksList.push(dataMap);
+          }
+
+        }
+      }
+    }
+    // creating an object using BFS for plotting visual.
+    var data = {
+      nodes : nodesList,
+      links : linksList
+    }
+    // Data is provided to d3force graph for further plotting.
+    console.log(data);
+    plotGraph(data);
+  }
+  else{
+      alert("Select valid domain!");
   }
 }
+
+
+
+

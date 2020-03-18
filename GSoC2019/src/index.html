@@ -1,6 +1,5 @@
 <html>
   <head>
-
   <meta charset="utf-8"/>
   <script src="js/force-graph.min.js"></script>
   <script src="http://unpkg.com/index-array-by"></script>
@@ -85,7 +84,7 @@
           </div>
           <div class="col">
             <center>
-            <button onclick="plotGraph()"style="margin-top: 14px;" class="btn btn-lg btn-primary">Plot Graph</button>
+            <button onclick="filterGraph()"style="margin-top: 14px;" class="btn btn-lg btn-primary">Filter Graph</button>
             </center>
         </div>
       </div>
@@ -218,9 +217,8 @@
         for(var i=0;i<noOfEdges;i++){
           G.addEdge(nodesMap.get(data["links"][i]["source"]),nodesMap.get(data["links"][i]["target"]),data["links"][i]["value"]);
         }
-        console.log(G);
+        plotGraph(data);
       });
-
   </script>
 </body>
 </html>
