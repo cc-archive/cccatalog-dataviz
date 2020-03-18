@@ -2,7 +2,6 @@
   <head>
 
   <meta charset="utf-8"/>
-  
   <script src="js/force-graph.min.js"></script>
   <script src="http://unpkg.com/index-array-by"></script>
   <script src="http://unpkg.com/dat.gui@0.7.2"></script>
@@ -11,87 +10,88 @@
   <script src="http://unpkg.com/d3-force"></script>
 
   <link rel="stylesheet" href="css/forced3.css" type="text/css">
-  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <script src="js/jquery-3.2.1.min.js"></script>
   <script src="js/highcharts.js"></script>
   <script src="js/exporting.js"></script>
   <script src="js/export-data.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="css/materialize.css" type="text/css">
-  <!--<script src="../../dist/force-graph.js"></script>-->
-  
-  <!--Jquery-->
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">  
-  <script src="https://code.jquery.com/jquery-3.4.1.js"></script>  
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  
+
+  <!-- Jquery UI JS -->
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
   <!-- Graph Filter JS -->
   <script src="js/filter.js"></script>
 
   <!-- Autocomplete feature -->
   <script type="text/javascript">
-  	$(function(){  
-  		var availableTags = Id;
-  		$("#myFilterInput").autocomplete({  
-    		source: availableTags  
-  		});  
-	});
+    $(function(){  
+      var availableTags = Id;
+      $("#myFilterInput").autocomplete({  
+        source: availableTags  
+      });  
+  });
   </script>
+
+
+  <link rel="stylesheet" href="css/materialize.css" type="text/css">
+  <!--<script src="../../dist/force-graph.js"></script>-->
+  
+  <!-- Jquery UI CSS -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 
 </head>
 
 <body>
-   <div class="pos-f-t">
-  <div class="collapse" id="navbarToggleExternalContent">
-    <div class="bg-info p-4">
-      <p class="text-white">This graph visualizes the relationships between domains that use Creative Commons licenses. For more information and to view the code, view the <a class='text-warning' href='https://github.com/creativecommons/cccatalog-dataviz/tree/master/GSoC2019' target='_blank'>CC Catalog Data Viz</a> repo on Github</p>
-      <span class="text-muted">This is a Google Summer of Code 2019 project by: <a class='text-warning' href='https://github.com/soccerdroid' target='_blank'>Mar&iacutea-Bel&eacuten Guaranda</a>. <br/>Mentors: Sophine Clachar and Breno Ferreira.</span>
+  <div class="pos-f-t">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-info p-4">
+        <p class="text-white">This graph visualizes the relationships between domains that use Creative Commons licenses. For more information and to view the code, view the <a class='text-warning' href='https://github.com/creativecommons/cccatalog-dataviz/tree/master/GSoC2019' target='_blank'>CC Catalog Data Viz</a> repo on Github</p>
+        <span class="text-muted">This is a Google Summer of Code 2019 project by: <a class='text-warning' href='https://github.com/soccerdroid' target='_blank'>Mar&iacutea-Bel&eacuten Guaranda</a>. <br/>Mentors: Sophine Clachar and Breno Ferreira.</span>
+      </div>
     </div>
-  </div>
-  <nav class="navbar navbar-dark bg-info">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <a class="navbar-brand" href="#">The Linked Commons</a>
-  </nav>
+    <nav class="navbar navbar-dark bg-info">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#">The Linked Commons</a>
+    </nav>
 
 
-  <!-- Filter selecter menu -->
-  <div class="container-fluid">
-      <div class="row">
-        <div class="col">
-          <div class="autocomplete">
-            <input id="myFilterInput" type="text" name="filteredId" placeholder="Filter by domain">
-          </div>
-        </div>
-        <div class="col">
-          <button onclick="plotGraph()"style="float: left;margin-top: 14px;" class="btn btn-lg btn-primary">Plot Graph</button>
-        </div>
-        <div class="col">
-          <div class="input-group mb-3" style="margin-top: 14px;">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="inputGroupSelect01">Select Distance</label>
+    <!-- Filter selecter menu -->
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col">
+            <div class="autocomplete">
+              <input id="myFilterInput" type="text" name="filteredId" placeholder="Filter by domain">
             </div>
-            <select class="custom-select" id="depth">
-              <option selected>Choose...</option>
-              <option value=1>1</option>
-              <option value=2>2</option>
-              <option value=3>3</option>
-              <option value=4>4</option>
-              <option value=5>5</option>
-            </select>
           </div>
+          
+          <div class="col">
+            <div class="input-group mb-3" style="margin-top: 14px;">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Select Distance</label>
+              </div>
+              <select class="custom-select" id="depth">
+                <option selected>Choose...</option>
+                <option value=1>1</option>
+                <option value=2>2</option>
+                <option value=3>3</option>
+                <option value=4>4</option>
+                <option value=5>5</option>
+              </select>
+            </div>
+          </div>
+          <div class="col">
+            <center>
+            <button onclick="plotGraph()"style="margin-top: 14px;" class="btn btn-lg btn-primary">Plot Graph</button>
+            </center>
         </div>
       </div>
     </div>
+  </div>
 
-
-</div>
   <div id="graph" class="visualization" >
     <div id="header"></div>
   </div>
