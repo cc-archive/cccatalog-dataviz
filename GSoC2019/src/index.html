@@ -182,9 +182,10 @@
       .linkDirectionalArrowLength(10)
       .nodeCanvasObjectMode(() => 'replace')
       .zoom(currentZoomLevel)
-
       //draw source and targets on the links
       .linkCanvasObjectMode(() => 'after')
+      .linkDirectionalArrowLength(5)
+      .linkDirectionalArrowRelPos(0.99)
       .linkCanvasObject((link, ctx) => {
         const MAX_FONT_SIZE = 6;
         const LABEL_NODE_MARGIN = Graph.nodeRelSize() * 1.5;
@@ -279,7 +280,7 @@
             otherGraph = traverseHighlight(node.id);
           }
         })
-      // adding callback to 
+      // adding callback to
       .onZoomEnd((e) => {
         // e contains zoom level and co-ordinates -> {k, x, y}
         currentZoomLevel = e.k;
