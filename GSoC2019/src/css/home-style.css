@@ -1,6 +1,6 @@
 #header{
-	background-color: #07263b;
-	padding: 3%;
+	background-color: #032f63;
+	padding: 10%;
 }
 iframe{
 	height: 100%; 
@@ -8,7 +8,7 @@ iframe{
 	border: none;
 }
 #header h1{
-	color: #8AF3FF;
+	color: #63a6f7;
 	font-size: 3em;
 	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 }
