@@ -1,0 +1,48 @@
+.modal-content {
+    justify-content: space-between;
+}
+
+body > div:first-child {
+    grid-area: header;
+}
+
+#graph {
+    grid-area: graph;
+}
+
+#pieChartModal {
+    grid-area: modal;
+}
+
+/* Side pop-up */
+@media only screen and (min-width: 1024px) {
+    :root{
+        --popup-width: 36vw;
+    }
+
+    .modal-backdrop {
+        display: none;
+    }
+
+    body.modal-open {
+        place-items: stretch;
+        height: 100vh;
+        display: grid;
+        grid-template:
+            " header                header"
+            " modal                 graph"
+            / var(--popup-width)    auto;
+    }
+
+    body.modal-open #graph,
+    body.modal-open #pieChartModal {
+        position: static;
+        height: calc(100vh - 64px);
+    }
+    body #pieChartModal {
+        max-height: none;
+        margin: 0;
+        height: auto;
+        width: var(--popup-width);
+    }
+}
