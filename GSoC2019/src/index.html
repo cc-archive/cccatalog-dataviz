@@ -18,6 +18,7 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="css/materialize.css" type="text/css">
+  <link rel="stylesheet" href="css/style.css" type="text/css">
   <!--<script src="../../dist/force-graph.js"></script>-->
 </head>
 
@@ -98,7 +99,7 @@
                 type: 'pie'
             },
             title: {
-                text: 'Use of CC licenses by <b>'+ node.provider_domain + "</b>"
+                text: 'Use of CC licenses by<br> <b>' + node.provider_domain + "</b>"
             },
             subtitle: {
                 text: 'Total links to Creative Commons: <b>'+ node.licenses_qty + '</b>'+'<br>Images on this domain: <b>'+ node.images + '</b>'
