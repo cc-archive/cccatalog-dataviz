@@ -14,6 +14,47 @@ body > div:first-child {
     grid-area: modal;
 }
 
+/* ZOOM CONTROL BUTTONS */
+.control-wrapper {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99;
+    margin: 5px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.control-wrapper button {
+    margin: 5px;
+    padding: 10px 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+    background-color: rgb(255, 255, 255);
+}
+.control-wrapper button:active{
+    box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}
+
+.control-wrapper button:active img {
+    opacity: 1;
+}
+
+.control-wrapper button img {
+    width: 20px;
+    opacity: 0.8;
+}
+
+.control-wrapper button:focus {
+    background-color: rgb(255, 255, 255);
+}
+  
+/* ZOOM CONTROL BUTTONS END */
+
 /* Side pop-up */
 @media only screen and (min-width: 1024px) {
     :root{
