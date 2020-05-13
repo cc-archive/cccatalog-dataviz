@@ -50,6 +50,11 @@
      </div>
     </div>
 
+    <!-- Zoom Control Widget -->
+    <div class="control-wrapper">
+      <button class="plus-button"><img src="assets/plus.svg" alt="" srcset=""></button>
+      <button class="minus-button"><img src="assets/minus.svg" alt="" srcset=""></button>
+    </div>
 
   <script>
 
@@ -150,7 +155,8 @@
 
     }
 
-
+    // set the inital value of zoom
+    let currentZoomLevel = 0.05; // storing the current zoom level
     const MAX_FONT_SIZE = 6;//0.15;
     const ending = '...';
     const MIN_FONT_SIZE = 0.08;
@@ -174,7 +180,7 @@
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 2 : 1)
       .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)')
       .nodeCanvasObjectMode(() => 'replace')
-      .zoom(0.05)
+      .zoom(currentZoomLevel)
 
       //draw source and targets on the links
       .linkCanvasObjectMode(() => 'after')
@@ -271,11 +277,35 @@
           if (node) {
             otherGraph = traverseHighlight(node.id);
           }
-        });
+        })
+      // adding callback to 
+      .onZoomEnd((e) => {
+        // e contains zoom level and co-ordinates -> {k, x, y}
+        currentZoomLevel = e.k;
+      });
 
-        Graph.d3Force('charge', null)
-        Graph.d3Force('charge', d3.forceManyBody().strength(-120));
-        Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
+      Graph.d3Force('charge', null)
+      Graph.d3Force('charge', d3.forceManyBody().strength(-120));
+      Graph.d3Force('collide',d3.forceCollide(Graph.nodeRelSize()))
+
+      // Zoom-Control Buttons
+      document.querySelector('.plus-button').addEventListener('click', () => {
+        // Incrementing zoom level by zoom step
+        Graph.zoom(currentZoomLevel + getZoomStep(), 250);
+      });
+      document.querySelector('.minus-button').addEventListener('click', () => {
+        // Decrementing zoom level by zoom step
+        Graph.zoom(currentZoomLevel - getZoomStep(), 250);
+      })
+
+      // helper function to calculate zoom step
+      function getZoomStep(){
+        if(currentZoomLevel>3){
+          return 1.2;
+        }else{
+          return currentZoomLevel/4;
+        }
+      }
     });
 
   </script>
