@@ -2,6 +2,7 @@ import React from 'react';
 import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
+import InfoBox from './InfoBox';
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json'
@@ -86,6 +87,7 @@ class Graph2D extends React.Component {
                                 enableNodeDrag={true}
                                 currentZoomLevel={this.currentZoomLevel}
                             />
+                            <InfoBox linkName={this.state.linkName} />
                         </div>
                     }
                 </div>

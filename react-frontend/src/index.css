@@ -39,3 +39,15 @@ body.modal-active .content-wrapper{
   border-color: #007bff;
   cursor: pointer;
 }
+
+
+.infoBox{
+  position: fixed;
+  top: 30vh;
+  right: 0%;
+  height: 50vh;
+  width: minmax(100px, 15vw);
+  background-color: rgba(0,0,0,0.5);
+  z-index: 10;
+  color: white;
+}
