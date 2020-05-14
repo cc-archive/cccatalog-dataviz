@@ -1,6 +1,7 @@
 import React from 'react';
 import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
+import LicenseChart from './LicenseChart';
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json'
@@ -19,10 +20,12 @@ class Graph2D extends React.Component {
         highlightNodes: null,
         linksPerDomains: null,
         currentZoomLevel: 1,
+        // boolean value to handle PieChart Rendering
+        licenseChartState: false,
         link: null,
         // current clicked node
         node: null,
-        // value of current hovered link [source_dest]
+        // value of current hovered link format: [source_dest]
         linkName: 'null_null'
     }
 
@@ -60,37 +63,57 @@ class Graph2D extends React.Component {
     render() {
         return (
             <React.Fragment>
-                {this.state.loading ? <h1 style={{textAlign: "center"}}>loading...</h1> :
-                    <ForceGraph2D
-                        ref={this.graphRef}
-                        graphData={this.state.graphData}
-                        onLinkHover={this.handleLinkHover}
-                        linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
-                        linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)'}
-                        nodeCanvasObjectMode={() => 'replace'}
-                        linkCanvasObjectMode={() => 'after'}
-                        backgroundColor='#07263b'
-                        linkCanvasObject={this.handleLinkCanvasObject}
-                        onNodeClick={this.handleOnNodeClick}
-                        nodeLabel={(node) => `${node.id}`}
-                        nodeCanvasObject={this.handleNodeCanvasObject}
-                        linkDirectionalArrowLength={5}
-                        linkDirectionalArrowRelPos={0.99}
-                        onNodeHover={this.handleOnNodeHover}
-                        onZoomEnd={this.handleZoomEnd}
-                        enableNodeDrag={true}
-                        currentZoomLevel={this.currentZoomLevel}
-                    />}
+                <div className='content-wrapper'>
+                    {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
+                        <div className='graph-wrapper'>
+                            <ForceGraph2D
+                                ref={this.graphRef}
+                                graphData={this.state.graphData}
+                                onLinkHover={this.handleLinkHover}
+                                linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
+                                linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)'}
+                                nodeCanvasObjectMode={() => 'replace'}
+                                linkCanvasObjectMode={() => 'after'}
+                                backgroundColor='#07263b'
+                                linkCanvasObject={this.handleLinkCanvasObject}
+                                onNodeClick={this.handleOnNodeClick}
+                                nodeLabel={(node) => `${node.id}`}
+                                nodeCanvasObject={this.handleNodeCanvasObject}
+                                linkDirectionalArrowLength={5}
+                                linkDirectionalArrowRelPos={0.99}
+                                onNodeHover={this.handleOnNodeHover}
+                                onZoomEnd={this.handleZoomEnd}
+                                enableNodeDrag={true}
+                                currentZoomLevel={this.currentZoomLevel}
+                            />
+                        </div>
+                    }
+                </div>
+
+                {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
+
             </React.Fragment>
         )
+    }
+
+    toggleLicenseChartState = () => {
+        this.setState({
+            licenseChartState: !this.state.licenseChartState,
+        })
+        document.body.classList.remove('modal-active');
     }
 
     handleOnNodeClick = (node) => {
         this.graphRef.current.centerAt(node.x, node.y, 1000);
         this.graphRef.current.zoom(5, 2000);
-        this.setState({
-            node: node
-        })
+        setTimeout(() => {
+            this.setState({
+                licenseChartState: true,
+                node: node
+            })
+            document.body.classList.add('modal-active');
+        }, 500);
+
     }
 
     handleOnNodeHover = node => {
