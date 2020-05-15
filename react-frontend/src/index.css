@@ -1,25 +1,31 @@
-*, *::after, *::before {
+*,
+*::after,
+*::before {
   margin: 0;
   padding: 0;
 }
 
-
-body{
-	overflow-x: hidden;
-	overflow-y: scroll;
+:root {
+  --searchbar-height: 60px;
 }
 
-.graph-wrapper canvas{
-  height: 100vh !important;
+body {
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
+.graph-wrapper canvas {
+  /* Setting height after subtracting from the searchbar height */
+  /* make sure to keep this aligned with the height in Graph2D component */
+  height: calc(100vh - var(--searchbar-height)) !important;
+  /* height: 100vh !important; */
+}
 
-body.modal-active .content-wrapper{
+body.modal-active .content-wrapper {
   -webkit-filter: blur(5px) grayscale(50%);
   filter: blur(5px) grayscale(50%);
   pointer-events: none;
 }
-
 
 #closeBtn {
   display: inline-block;
@@ -29,29 +35,28 @@ body.modal-active .content-wrapper{
   vertical-align: middle;
   outline: none;
   border: 1px solid transparent;
-  padding: .3rem .7rem;
+  padding: 0.3rem 0.7rem;
   font-size: 1rem;
   line-height: 1.5;
-  border-radius: .25rem;
-  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   color: #fff;
   background-color: #007bff;
   border-color: #007bff;
   cursor: pointer;
 }
 
-
-.infoBox{
+.infoBox {
   position: fixed;
   top: 30vh;
   right: 0%;
   height: 50vh;
   width: minmax(100px, 15vw);
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
   color: white;
 }
-
 
 /* ZOOM TOOLKIT BEGIN */
 .zoomtoolkit-wrapper {
@@ -72,13 +77,13 @@ body.modal-active .content-wrapper{
   border: none;
   border-radius: 10px;
   font-size: 20px;
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);
   background-color: rgb(255, 255, 255);
   outline: none;
   cursor: pointer;
 }
-.zoomtoolkit-wrapper button:active{
-  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+.zoomtoolkit-wrapper button:active {
+  box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);
 }
 
 .zoomtoolkit-wrapper button:active img {
@@ -96,12 +101,134 @@ body.modal-active .content-wrapper{
 
 /* ZOOM TOOLKIT END */
 
+/* SEARCHFILTERBOX BEGIN */
 
+.searchbar-main-wrapper {
+  height: var(--searchbar-height);
+  background-color: black;
+  color: white;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
 
+.searchbar-items-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
 
-@media all and (max-width: 384px){
+.searchbar-item {
+  width: calc(var(--searchbar-height) * 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchbar-icon {
+  width: calc(var(--searchbar-height) * 0.5);
+  height: calc(var(--searchbar-height) * 0.5);
+  border-radius: 50%;
+  background-color: #484a4d;
+  padding: 5px;
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 300ms;
+}
+
+.searchbar-icon:hover {
+  filter: brightness(1.2);
+}
+
+.searchbar-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: #dadce1;
+}
+
+.dropdown-wrapper {
+  position: absolute;
+  z-index: 100;
+  top: 58px;
+  width: 300px;
+  transform: translateX(-45%);
+  overflow: hidden;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #474a4d;
+  background: #242526;
+}
+
+.dropdown-menu-item {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 8px;
+  transition: backgroud 500ms;
+  padding: 0.5rem;
+}
+
+.dropdown-menu-item label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-menu-item input {
+  width: 50%;
+  height: 80%;
+  padding: 0 0.714em;
+  margin-left: auto;
+  font: inherit;
+  border: 0;
+  outline: 0;
+  font-weight: 700;
+  border-radius: 5em;
+  
+}
+
+.dropdown-menu-item button{
+  color: white;
+  padding: 0;
+  height: 100%;
+  width: fit-content;
+  padding: 1rem;
+  background-color: #ff7b73;
+  border: 0;
+  outline: 0;
+  margin-left: auto;
+  font-weight: 400;
+  border-radius: 5em;
+  box-sizing: border-box;
+}
+
+.dropdown-menu-item.disabled{
+  cursor: not-allowed;
+}
+
+.dropdown-menu-item.disabled input{
+  cursor: not-allowed;
+}
+
+.dropdown-menu-item button:disabled{
+  cursor: not-allowed;
+  background-color: #f89690;
+}
+
+.dropdown-menu-item:hover {
+  background: #525357;
+}
+
+@media all and (max-width: 384px) {
   .zoomtoolkit-wrapper {
-    bottom : 15px;
-    right : 5px;
+    bottom: 15px;
+    right: 5px;
   }
 }

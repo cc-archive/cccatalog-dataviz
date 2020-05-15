@@ -3,6 +3,7 @@ import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
+import SearchFilterBox from './SearchFilterBox';
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json'
@@ -41,23 +42,7 @@ class Graph2D extends React.Component {
         fetch(ENDPOINT)
             .then((res) => res.json())
             .then(res => {
-                let obj = {};
-                res.links.forEach((e) => {
-                    if (obj[e.source] === undefined) {
-                        obj[e.source] = {}
-                    }
-                    obj[e.source][e.target] = [{ value: e.value }]
-                })
-                this.setState({
-                    graphData: res,
-                    linksPerDomains: obj
-                })
-                this.setState({
-                    loading: false
-                })
-                this.graphRef.current.d3Force('charge', null)
-                this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
-                this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
+                this.simulateForceGraph(res);
             });
 
     }
@@ -68,8 +53,10 @@ class Graph2D extends React.Component {
                 <div className='content-wrapper'>
                     {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
                         <div className='graph-wrapper'>
+                            <SearchFilterBox handleSubmit={this.handleFilterSubmit} />
                             <ForceGraph2D
                                 ref={this.graphRef}
+                                height={window.innerHeight - 60}
                                 graphData={this.state.graphData}
                                 onLinkHover={this.handleLinkHover}
                                 linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
@@ -100,6 +87,83 @@ class Graph2D extends React.Component {
 
             </React.Fragment>
         )
+    }
+
+    simulateForceGraph = (res) => {
+        console.log(res['nodes']['icij']);
+        let obj = {};
+        res.links.forEach((e) => {
+            if (obj[e.source] === undefined) {
+                obj[e.source] = {}
+            }
+            obj[e.source][e.target] = [{ value: e.value }]
+        })
+        this.setState({
+            graphData: res,
+            linksPerDomains: obj
+        })
+        this.setState({
+            loading: false
+        })
+        this.graphRef.current.d3Force('charge', null)
+        this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
+        this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
+    }
+
+    dfs(adjacencyList, node, visited, maxLevel, currLevel, links) {
+        visited.set(node, true);
+        let neighbours = adjacencyList[node];
+        if (currLevel === maxLevel || !neighbours) {
+            // if current level is equal to max level stoping the traversal
+            return;
+        }
+        console.log(node, adjacencyList, neighbours);
+        Object.entries(neighbours).forEach(neighbour => {
+            if (!visited.has(neighbour[0])) {
+                console.log(neighbour[0]);
+                // not yet visited
+                links.push({ source: node, target: neighbour[0], value: neighbour[1][0]['value'] })
+                this.dfs(adjacencyList, neighbour[0], visited, maxLevel, currLevel + 1, links);
+            }
+        })
+    }
+
+    handleFilterSubmit = ({ name: startNode, distance }) => {
+        if (this.state.linksPerDomains[startNode]) {
+            let visited = new Map();
+            let links = [];
+            distance = parseInt(distance);
+            this.dfs(this.state.linksPerDomains, startNode, visited, distance, 0, links);
+            let nodes = [];
+            let masterNodes = this.state.graphData['nodes'];
+            let n = masterNodes.length;
+            visited.clear();
+            links.forEach((link) => {
+                for (let i = 0; i < n; i++) {
+                    if ((!visited.has(link['source']) && masterNodes[i]['id'] === link['source'])) {
+                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] / 2 });
+                        visited.set(link['source'], true);
+                    }
+                    if (!visited.has(link['target']) && masterNodes[i]['id'] === link['target']) {
+                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] / 2 });
+                        visited.set(link['target'], true);
+                    }
+                }
+            });
+            // console.log({ links, nodes });
+            // this.setState({
+            //     graphData: { links, nodes },
+            // })
+            this.simulateForceGraph({ links, nodes })
+            // this.graphRef.current.centerAt(node.x, node.y, 1000);
+
+        } else {
+            // Invalid
+            alert('Invalid Query');
+        }
+
+
+
     }
 
     handleZoomOut = () => {
