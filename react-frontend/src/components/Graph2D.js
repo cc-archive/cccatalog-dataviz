@@ -2,7 +2,7 @@ import React from 'react';
 import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
-import InfoBox from './InfoBox';
+import ZoomToolkit from './ZoomToolkit';
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json'
@@ -20,14 +20,15 @@ class Graph2D extends React.Component {
         // contains all node
         highlightNodes: null,
         linksPerDomains: null,
-        currentZoomLevel: 1,
         // boolean value to handle PieChart Rendering
         licenseChartState: false,
         link: null,
         // current clicked node
         node: null,
         // value of current hovered link format: [source_dest]
-        linkName: 'null_null'
+        linkName: 'null_null',
+        // set the inital value of zoom
+        currentZoomLevel: 1, // storing the current zoom level
     }
 
     constructor(props) {
@@ -87,7 +88,10 @@ class Graph2D extends React.Component {
                                 enableNodeDrag={true}
                                 currentZoomLevel={this.currentZoomLevel}
                             />
-                            <InfoBox linkName={this.state.linkName} />
+                            <ZoomToolkit
+                                handleZoomIn={this.handleZoomIn}
+                                handleZoomOut={this.handleZoomOut}
+                            />
                         </div>
                     }
                 </div>
@@ -96,6 +100,26 @@ class Graph2D extends React.Component {
 
             </React.Fragment>
         )
+    }
+
+    handleZoomOut = () => {
+        // Decrementing zoom level by zoom step
+        this.graphRef.current.zoom(this.state.currentZoomLevel - this.getZoomStep(this.state.currentZoomLevel), 250);
+    }
+
+    handleZoomIn = () => {
+        // Incrementing zoom level by zoom step
+        this.graphRef.current.zoom(this.state.currentZoomLevel + this.getZoomStep(this.state.currentZoomLevel), 250);
+    }
+
+
+    // helper function to calculate zoom step
+    getZoomStep(currentZoomLevel) {
+        if (currentZoomLevel > 3) {
+            return 1.2;
+        } else {
+            return currentZoomLevel / 4;
+        }
     }
 
     toggleLicenseChartState = () => {
