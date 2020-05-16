@@ -2,32 +2,34 @@ import React, { useState } from 'react';
 import { ReactComponent as SearchIcon } from '../assets/icons/search.svg';
 
 
-class SearchFilterBox extends React.Component {
-    state= {
-        dropdownIsOpen:false,
-    }
-    render() {
-        return (
-            <div className="searchbar-main-wrapper">
-                <div className="title-main">
-                    Linked Commons
+function SearchFilterBox(props) {
+    const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
+    const [name, setName] = useState('');
+    const [distance, setDistance] = useState('');
+    return (
+        <div className="searchbar-main-wrapper">
+            <div className="title-main">
+                Linked Commons
                 </div>
-                <ul className="searchbar-items-wrapper">
+            <ul className="searchbar-items-wrapper">
 
-                    <li className='searchbar-item'>
-                        <a className='searchbar-icon' href='javascript:void(0)' onClick={() => this.setState({dropdownIsOpen: !this.state.dropdownIsOpen})}>{<SearchIcon />}</a>
-                        {this.state.dropdownIsOpen && <DropdownMenu handleSubmit={this.props.handleSubmit} />}
-                    </li>
-                </ul>
-            </div>
-        );
-    }
+                <li className='searchbar-item'>
+                    <button className='searchbar-icon' onClick={() => setDropdownIsOpen(!dropdownIsOpen)}>{<SearchIcon />}</button>
+                    {dropdownIsOpen && <DropdownMenu
+                        handleSubmit={props.handleSubmit}
+                        name={name}
+                        setName={setName}
+                        distance={distance}
+                        setDistance={setDistance} />}
+                </li>
+            </ul>
+        </div>
+    );
 }
 
 // searchbar and distance
 function DropdownMenu(props) {
-    const [name, setName] = useState('');
-    const [distance, setDistance] = useState('');
+    const { name, setName, distance, setDistance } = props;
     return (
         <div className='dropdown-wrapper'>
             <form onSubmit={(e) => { e.preventDefault(); props.handleSubmit({ name, distance }) }}>

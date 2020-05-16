@@ -30,6 +30,8 @@ class Graph2D extends React.Component {
         linkName: 'null_null',
         // set the inital value of zoom
         currentZoomLevel: 1, // storing the current zoom level
+        // !TODO: to be used for re-setting the state
+        originalGraphData: null,
     }
 
     constructor(props) {
@@ -42,6 +44,9 @@ class Graph2D extends React.Component {
         fetch(ENDPOINT)
             .then((res) => res.json())
             .then(res => {
+                this.setState({
+                    originalGraphData: res,
+                })
                 this.simulateForceGraph(res);
             });
 
@@ -90,7 +95,6 @@ class Graph2D extends React.Component {
     }
 
     simulateForceGraph = (res) => {
-        console.log(res['nodes']['icij']);
         let obj = {};
         res.links.forEach((e) => {
             if (obj[e.source] === undefined) {
@@ -117,19 +121,20 @@ class Graph2D extends React.Component {
             // if current level is equal to max level stoping the traversal
             return;
         }
-        console.log(node, adjacencyList, neighbours);
         Object.entries(neighbours).forEach(neighbour => {
             if (!visited.has(neighbour[0])) {
-                console.log(neighbour[0]);
                 // not yet visited
                 links.push({ source: node, target: neighbour[0], value: neighbour[1][0]['value'] })
+                // calling dfs again and incrementing the level by 1
                 this.dfs(adjacencyList, neighbour[0], visited, maxLevel, currLevel + 1, links);
             }
         })
     }
 
     handleFilterSubmit = ({ name: startNode, distance }) => {
+        startNode = startNode.toLowerCase();
         if (this.state.linksPerDomains[startNode]) {
+            distance = distance.toLowerCase()
             let visited = new Map();
             let links = [];
             distance = parseInt(distance);
@@ -141,22 +146,20 @@ class Graph2D extends React.Component {
             links.forEach((link) => {
                 for (let i = 0; i < n; i++) {
                     if ((!visited.has(link['source']) && masterNodes[i]['id'] === link['source'])) {
-                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] / 2 });
+                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] });
                         visited.set(link['source'], true);
                     }
                     if (!visited.has(link['target']) && masterNodes[i]['id'] === link['target']) {
-                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] / 2 });
+                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] });
                         visited.set(link['target'], true);
                     }
                 }
             });
-            // console.log({ links, nodes });
-            // this.setState({
-            //     graphData: { links, nodes },
-            // })
-            this.simulateForceGraph({ links, nodes })
-            // this.graphRef.current.centerAt(node.x, node.y, 1000);
-
+            this.simulateForceGraph({ links, nodes });
+            // A nice animated zooming effect into the filtered graph
+            setTimeout(() => {
+                this.graphRef.current.zoomToFit(1000, 10)
+            }, 500)
         } else {
             // Invalid
             alert('Invalid Query');
