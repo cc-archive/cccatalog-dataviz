@@ -13,10 +13,10 @@
 
 body {
   overflow-x: hidden;
-  overflow-y: scroll;
 }
 
 .graph-wrapper canvas {
+  position: absolute;
   /* Setting height after subtracting from the searchbar height */
   /* make sure to keep this aligned with the height in Graph2D component */
   height: calc(100vh - var(--searchbar-height)) !important;

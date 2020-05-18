@@ -1,30 +1,11 @@
 import React from 'react';
-import { Pie, defaults } from 'react-chartjs-2'
+import ReactHighcharts from 'react-highcharts';
+import Exporting from 'highcharts/modules/exporting';
+import highcharts from 'highcharts';
+Exporting(ReactHighcharts.Highcharts);
 
 
 class LicenseChart extends React.Component {
-
-    constructor(props) {
-        super(props)
-        defaults.global.showLines = true;
-        defaults.global.tooltips.mode = 'nearest';
-        defaults.global.tooltips.position = 'average';
-        defaults.global.tooltips.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-        defaults.global.tooltips.displayColors = true;
-        defaults.global.tooltips.borderColor = '#c62828';
-        defaults.global.tooltips.borderWidth = 1;
-        defaults.global.tooltips.titleFontColor = '#000';
-        defaults.global.tooltips.bodyFontColor = '#000';
-        defaults.global.tooltips.caretPadding = 4;
-        defaults.global.tooltips.intersect = false;
-        defaults.global.tooltips.mode = 'nearest';
-        defaults.global.tooltips.position = 'nearest';
-        defaults.global.legend.display = true;
-        defaults.global.legend.position = 'bottom';
-        defaults.global.hover.intersect = false;
-    }
-
-
     render() {
         let { node } = this.props;
         return (
@@ -32,9 +13,9 @@ class LicenseChart extends React.Component {
                 <div id="licensechart" style={{ display: 'block', border: '1px solid black', position: 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)', width: '600px', maxWidth: '100%', background: 'white', padding: '20px' }}>
                     <div className="licensechart-modal-content" >
                         <div id="licensechart-data-main">
-                            {node.provider_domain==='Domain not available'? `The CC License information of ${node.id} is not available`: this.getPieChart()}
+                            {node.provider_domain === 'Domain not available' ? `The CC License information of ${node.id} is not available` : this.getPieChart()}
                         </div>
-                        <div className="licensechart-modal-footer" style={{ textAlign: 'right', margin: '10px'}}>
+                        <div className="licensechart-modal-footer" style={{ textAlign: 'right', margin: '10px' }}>
                             <button type="button" id="closeBtn" onClick={this.props.handler}>Close</button>
                         </div>
                     </div>
@@ -44,69 +25,63 @@ class LicenseChart extends React.Component {
     }
 
 
-    getPieChart = () => {
-        let chartValues = []
-        let chartLabels = []
-        let data = this.props.node.cc_licenses;
+    getPieChart() {
+        // assumes that node has provider_domain
+        let node = this.props.node;
+        let data = node.cc_licenses;
+        let licensed_data = []
         for (let license in data) {
-            chartLabels.push(this.beautifyLicensename(license.substring(1, license.length - 1)));
-            chartValues.push(data[license]);
+            //build a dictionary with license as key and as value, the number of licenses
+            let element = {}
+            element.name = this.beautifyLicensename(license.substring(1, license.length - 1));
+            element.y = data[license];
+            //push that dictionary to a list
+            licensed_data.push(element)
         }
-        const chartData = {
-            datasets: [
-                {
-                    data: chartValues,
-                    backgroundColor: [
-                        '#FF6384',
-                        '#36A2EB',
-                        '#FFCE56'
-                        ],
-                        hoverBackgroundColor: [
-                        '#FF6384',
-                        '#36A2EB',
-                        '#FFCE56'
-                        ]
-                },
-            ],
-            labels: chartLabels,
+
+        let config = {
+            exporting: {
+                showTable: false,
+                tableCaption: '<br><b>Data table</b>',
+            },
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: `Use of CC licenses by<br> <b> ${node.provider_domain} </b>`
+            },
+            subtitle: {
+                text: `Total links to Creative Commons: <b> ${node.licenses_qty} </b><br>Images on this domain: <b> ${node.images} </b>`
+            },
+            tooltip: {
+                pointFormat: '{series.name}: {point.percentage:.2f}%'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                        style: {
+                            color: (highcharts.theme && highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'License',
+                colorByPoint: true,
+                data: licensed_data
+            }]
         };
-        const chartOptions = {
-            events: ['mousemove', 'mouseout', 'touchstart', 'touchmove', 'touchend'],
-            layout: {
-                padding: {
-                    left: 20,
-                    right: 20,
-                    top: 0,
-                    bottom: 10,
-                },
-            },
-            legend: {
-                display: true,
-            },
-            responsive: true,
-            maintainAspectRatio: true,
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        const dataset = data.datasets[tooltipItem.datasetIndex];
-                        const meta = dataset._meta[Object.keys(dataset._meta)[0]];
-                        const total = meta.total;
-                        const currentValue = dataset.data[tooltipItem.index];
-                        const percentage = parseFloat(
-                            ((currentValue / total) * 100).toFixed(3)
-                        );
-                        return currentValue + ' (' + percentage + '%)';
-                    },
-                    title: function (tooltipItem, data) {
-                        return data.labels[tooltipItem[0].index];
-                    },
-                },
-            },
-        };
-        return <Pie data={chartData} options={chartOptions} />
+        return <ReactHighcharts config={config}></ReactHighcharts>;
     }
 
-
+    // helper function to beautify license name of the particular node
     beautifyLicensename(string) {
         let no_comma = string.replace(",", " v.");
         let no_apostrophe = no_comma.replace(/'+/g, "");
