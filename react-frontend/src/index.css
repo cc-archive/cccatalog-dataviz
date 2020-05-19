@@ -9,13 +9,13 @@
 
 :root {
   --searchbar-height: 60px;
+  --popup-width: 36vw;
 }
 
 body {
   overflow-x: hidden;
 }
-
-.graph-wrapper canvas {
+.graph-wrapper #graph-canvas canvas {
   position: absolute;
   /* Setting height after subtracting from the searchbar height */
   /* make sure to keep this aligned with the height in Graph2D component */
@@ -23,10 +23,15 @@ body {
   /* height: 100vh !important; */
 }
 
-body.modal-active .content-wrapper {
+body.modal-active .content-wrapper .graph-wrapper {
   -webkit-filter: blur(5px) grayscale(50%);
   filter: blur(5px) grayscale(50%);
   pointer-events: none;
+}
+body.modal-active .searchbar-main-wrapper {
+  -webkit-filter: blur(1px) grayscale(10%);
+  filter: blur(1px) grayscale(10%);
+  pointer-events: none !important;
 }
 
 #closeBtn {
@@ -267,3 +272,67 @@ body.modal-active .content-wrapper {
     font-size: 1rem;
   }
 }
+
+/* LICENSE CHART BEGIN */
+
+#licensechart {
+  display: block;
+  border: 1px solid black;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  max-width: 100%;
+  background: white;
+  padding: 20px;
+  z-index: 1000;
+}
+
+@media only screen and (min-width: 900px) {
+  /* Overriding pop up styling on other elements */
+  body.modal-active .content-wrapper .graph-wrapper {
+    -webkit-filter: none;
+    filter: none;
+    pointer-events: all;
+  }
+  body.modal-active .searchbar-main-wrapper {
+    -webkit-filter: none;
+    filter: none;
+    pointer-events: all;
+  }
+
+  body.modal-active .content-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    grid-auto-flow: row;
+  }
+
+  #licensechart {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    background: white;
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    display: block;
+    padding: 0;
+    margin: 0;
+    z-index: 1;
+    width: 100%;
+    overflow-x: hidden;
+    height: calc(100vh-var(--searchbar-height));
+    border: none;
+  }
+
+  .licensechart-modal-content {
+    margin-top: 15vh;
+    padding: 5px;
+    vertical-align: center;
+    z-index: 3;
+    justify-content: space-between;
+  }
+}
+
+/* LICENSE CHART END */

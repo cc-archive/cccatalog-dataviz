@@ -55,40 +55,45 @@ class Graph2D extends React.Component {
     render() {
         return (
             <React.Fragment>
+                <SearchFilterBox handleSubmit={this.handleFilterSubmit} />
                 <div className='content-wrapper'>
+
+                    {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
+
                     {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            <SearchFilterBox handleSubmit={this.handleFilterSubmit} />
-                            <ForceGraph2D
-                                ref={this.graphRef}
-                                height={window.innerHeight - 60}
-                                graphData={this.state.graphData}
-                                onLinkHover={this.handleLinkHover}
-                                linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
-                                linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)'}
-                                nodeCanvasObjectMode={() => 'replace'}
-                                linkCanvasObjectMode={() => 'after'}
-                                backgroundColor='#07263b'
-                                linkCanvasObject={this.handleLinkCanvasObject}
-                                onNodeClick={this.handleOnNodeClick}
-                                nodeLabel={(node) => `${node.id}`}
-                                nodeCanvasObject={this.handleNodeCanvasObject}
-                                linkDirectionalArrowLength={5}
-                                linkDirectionalArrowRelPos={0.99}
-                                onNodeHover={this.handleOnNodeHover}
-                                onZoomEnd={this.handleZoomEnd}
-                                enableNodeDrag={true}
-                                currentZoomLevel={this.currentZoomLevel}
-                            />
-                            <ZoomToolkit
-                                handleZoomIn={this.handleZoomIn}
-                                handleZoomOut={this.handleZoomOut}
-                            />
+                            
+                            <div id="graph-canvas">
+                                <ForceGraph2D
+                                    ref={this.graphRef}
+                                    height={window.innerHeight - 60}
+                                    graphData={this.state.graphData}
+                                    onLinkHover={this.handleLinkHover}
+                                    linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
+                                    linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)'}
+                                    nodeCanvasObjectMode={() => 'replace'}
+                                    linkCanvasObjectMode={() => 'after'}
+                                    backgroundColor='#07263b'
+                                    linkCanvasObject={this.handleLinkCanvasObject}
+                                    onNodeClick={this.handleOnNodeClick}
+                                    nodeLabel={(node) => `${node.id}`}
+                                    nodeCanvasObject={this.handleNodeCanvasObject}
+                                    linkDirectionalArrowLength={5}
+                                    linkDirectionalArrowRelPos={0.99}
+                                    onNodeHover={this.handleOnNodeHover}
+                                    onZoomEnd={this.handleZoomEnd}
+                                    enableNodeDrag={true}
+                                    currentZoomLevel={this.currentZoomLevel}
+                                />
+                                <ZoomToolkit
+                                    handleZoomIn={this.handleZoomIn}
+                                    handleZoomOut={this.handleZoomOut}
+                                />
+                            </div>
                         </div>
                     }
                 </div>
 
-                {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
             </React.Fragment>
         )
@@ -197,16 +202,18 @@ class Graph2D extends React.Component {
     }
 
     handleOnNodeClick = (node) => {
-        this.graphRef.current.centerAt(node.x, node.y, 1000);
-        this.graphRef.current.zoom(5, 2000);
-        setTimeout(() => {
-            this.setState({
-                licenseChartState: true,
-                node: node
-            })
-            document.body.classList.add('modal-active');
-        }, 500);
-
+        if(node){
+            this.graphRef.current.centerAt(node.x, node.y, 1000);
+            this.graphRef.current.zoom(5, 2000);
+            setTimeout(() => {
+                this.setState({
+                    licenseChartState: true,
+                    node: node
+                })
+                document.body.classList.add('modal-active');
+            }, 500);
+        }
+            
     }
 
     handleOnNodeHover = node => {

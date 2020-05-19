@@ -8,12 +8,13 @@ Exporting(ReactHighcharts.Highcharts);
 class LicenseChart extends React.Component {
     render() {
         let { node } = this.props;
+        console.log("NEW:", node);
         return (
             <React.Fragment>
-                <div id="licensechart" style={{ display: 'block', border: '1px solid black', position: 'fixed', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)', width: '600px', maxWidth: '100%', background: 'white', padding: '20px' }}>
+                <div id="licensechart">
                     <div className="licensechart-modal-content" >
                         <div id="licensechart-data-main">
-                            {node.provider_domain === 'Domain not available' ? `The CC License information of ${node.id} is not available` : this.getPieChart()}
+                            {node.provider_domain === 'Domain not available' ? <div><span>The CC License information of</span><b> {node.id} </b><span>is not available</span></div> : this.getPieChart()}
                         </div>
                         <div className="licensechart-modal-footer" style={{ textAlign: 'right', margin: '10px' }}>
                             <button type="button" id="closeBtn" onClick={this.props.handler}>Close</button>
@@ -24,7 +25,12 @@ class LicenseChart extends React.Component {
         )
     }
 
-
+    shouldComponentUpdate(props){
+        if(this.props.node === props.node){
+            return false;
+        }
+        return true;
+    }
     getPieChart() {
         // assumes that node has provider_domain
         let node = this.props.node;
