@@ -31,7 +31,7 @@ body.modal-active .content-wrapper .graph-wrapper {
 body.modal-active .searchbar-main-wrapper {
   -webkit-filter: blur(1px) grayscale(10%);
   filter: blur(1px) grayscale(10%);
-  pointer-events: none !important;
+  pointer-events: none;
 }
 
 #closeBtn {
@@ -88,6 +88,12 @@ body.modal-active .searchbar-main-wrapper {
   background-color: rgb(255, 255, 255);
   outline: none;
   cursor: pointer;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 .zoomtoolkit-wrapper button:active {
   box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);
