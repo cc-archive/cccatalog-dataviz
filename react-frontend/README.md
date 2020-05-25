@@ -1,28 +1,24 @@
-# Linked Commons
+# Linked Commons [Frontend]
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/a43bf4d5-cfce-4859-941a-69fb889cb23e/deploy-status)](https://app.netlify.com/sites/ccdataviz/deploys)
+The following subfolder contains the frontend source code of the application. 
 
-**Parent Repo. -:** [cccatalog-dataviz](https://github.com/creativecommons/cccatalog-dataviz)
+## Getting Started
 
+### Prerequisites
+
+This application is using react, for which NodeJS and npm are necessary. NodeJS can be installed from [here](https://nodejs.org/en/).
 
 ### Setting Up Development Environment
 
-1. Clone the repo and checkout the `react-migration` branch
-```bash
-git clone URL
-git checkout react-migration
-```
-2. Change directory and Install all dependencies
+1. Install all dependencies (Make sure that there exists a package.json in the current path)
 ```bash
 npm install
 ```
-3. To run the app in the development mode, use the following command
+2. To run the app in the development mode, use the following command
 ```bash
 npm start
 ```
-4. To build the app for production into the build folder, use the following command
+3. To build the app for production into the build folder, use the following command
 ```bash
 npm run build
 ```
-
-**Note:** The above instructions to setup development environment locally assumes that NodeJS is installed in the PC. If not, you can install NodeJS from [here](https://nodejs.org/en/), or visit the hosted application on netlify [here](https://ccdataviz.netlify.app/).

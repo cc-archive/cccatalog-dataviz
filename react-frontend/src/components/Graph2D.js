@@ -41,6 +41,7 @@ class Graph2D extends React.Component {
     }
 
     componentDidMount() {
+        // Fetching the data from source endpoint
         fetch(ENDPOINT)
             .then((res) => res.json())
             .then(res => {
@@ -99,6 +100,7 @@ class Graph2D extends React.Component {
         )
     }
 
+    // Update the data and simulates the graph rendering 
     simulateForceGraph = (res) => {
         let obj = {};
         res.links.forEach((e) => {
@@ -119,7 +121,7 @@ class Graph2D extends React.Component {
         this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
     }
 
-    dfs(adjacencyList, node, visited, maxLevel, currLevel, links) {
+    searchNodesInDepth(adjacencyList, node, visited, maxLevel, currLevel, links) {
         visited.set(node, true);
         let neighbours = adjacencyList[node];
         if (currLevel === maxLevel || !neighbours) {
@@ -130,12 +132,13 @@ class Graph2D extends React.Component {
             if (!visited.has(neighbour[0])) {
                 // not yet visited
                 links.push({ source: node, target: neighbour[0], value: neighbour[1][0]['value'] })
-                // calling dfs again and incrementing the level by 1
-                this.dfs(adjacencyList, neighbour[0], visited, maxLevel, currLevel + 1, links);
+                // calling searchNodesInDepth again and incrementing the level by 1
+                this.searchNodesInDepth(adjacencyList, neighbour[0], visited, maxLevel, currLevel + 1, links);
             }
         })
     }
 
+    // Handles Filtering by node name and distance
     handleFilterSubmit = ({ name: startNode, distance }) => {
         startNode = startNode.toLowerCase();
         if (this.state.linksPerDomains[startNode]) {
@@ -143,7 +146,7 @@ class Graph2D extends React.Component {
             let visited = new Map();
             let links = [];
             distance = parseInt(distance);
-            this.dfs(this.state.linksPerDomains, startNode, visited, distance, 0, links);
+            this.searchNodesInDepth(this.state.linksPerDomains, startNode, visited, distance, 0, links);
             let nodes = [];
             let masterNodes = this.state.graphData['nodes'];
             let n = masterNodes.length;
@@ -167,11 +170,8 @@ class Graph2D extends React.Component {
             }, 500)
         } else {
             // Invalid
-            alert('Invalid Query');
+            alert('Invalid Node Name');
         }
-
-
-
     }
 
     handleZoomOut = () => {
@@ -194,6 +194,7 @@ class Graph2D extends React.Component {
         }
     }
 
+    // Function to remove the modal window
     toggleLicenseChartState = () => {
         this.setState({
             licenseChartState: !this.state.licenseChartState,
