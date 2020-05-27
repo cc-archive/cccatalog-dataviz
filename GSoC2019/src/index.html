@@ -173,6 +173,7 @@
       .onLinkHover(link => hoverLink = link)
       .linkWidth(link => (hoverLink === link || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id) ) ? 2 : 1)
       .linkColor(link => (link === hoverLink || highlightNodes.has(link.source.id) || highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)')
+      .linkDirectionalArrowLength(10)
       .nodeCanvasObjectMode(() => 'replace')
       .zoom(0.05)
       .linkDirectionalArrowLength(5)
