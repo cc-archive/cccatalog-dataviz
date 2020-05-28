@@ -93,7 +93,7 @@ class Graph2D extends React.Component {
 
                     {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            <Sidebar isDarkMode={this.state.isDarkMode}/>
+                            <Sidebar isDarkMode={this.state.isDarkMode} handleSubmit={this.handleFilterSubmit}/>
                             <div id="graph-canvas">
                                 <ForceGraph2D
                                     ref={this.graphRef}
