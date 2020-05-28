@@ -15,11 +15,12 @@
 body {
   overflow-x: hidden;
 }
+
 .graph-wrapper #graph-canvas canvas {
-  position: absolute;
+  position: fixed;
   /* Setting height after subtracting from the searchbar height */
   /* make sure to keep this aligned with the height in Graph2D component */
-  height: calc(100vh - var(--searchbar-height)) !important;
+  height: 100vh !important;
   /* height: 100vh !important; */
 }
 
@@ -278,6 +279,28 @@ body.modal-active .searchbar-main-wrapper {
     font-size: 1rem;
   }
 }
+
+
+/* DARK MODE SWITCH BEGIN */
+.darkmodeswitch{
+  position: fixed;
+  z-index: 100;
+  width: fit-content;
+  padding: 4px 16px;
+  background-color: black;
+  color: white;
+  border-radius: 0px 0px 4px 4px;
+  top: 0;
+  left: 90%;
+  transform: translateX(-90%);
+  user-select: none;
+  cursor: pointer;
+}
+
+html[data-theme='dark'] .darkmodeswitch{
+  background-color: #ED592F;
+}
+
 
 /* LICENSE CHART BEGIN */
 

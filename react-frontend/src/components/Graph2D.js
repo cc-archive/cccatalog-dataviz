@@ -84,7 +84,8 @@ class Graph2D extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <SearchFilterBox handleSubmit={this.handleFilterSubmit} />
+                {/* <SearchFilterBox handleSubmit={this.handleFilterSubmit} /> */}
+                <DarkModeSwitch toggleThemeState= {this.toggleThemeHandler}/>
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
@@ -95,7 +96,6 @@ class Graph2D extends React.Component {
                             <div id="graph-canvas">
                                 <ForceGraph2D
                                     ref={this.graphRef}
-                                    height={window.innerHeight - 60}
                                     graphData={this.state.graphData}
                                     onLinkHover={this.handleLinkHover}
                                     linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
@@ -124,6 +124,15 @@ class Graph2D extends React.Component {
                 </div>
             </React.Fragment>
         )
+    }
+
+    toggleThemeHandler = () => {
+        let newTheme = this.state.isDarkMode ? 'light' : 'dark';
+        this.setState({
+            isDarkMode : newTheme === 'dark' ? true : false,
+        })
+        window.localStorage.setItem('data-theme', newTheme);
+        document.documentElement.setAttribute('data-theme', newTheme);
     }
 
     // Update the data and simulates the graph rendering 
@@ -373,3 +382,13 @@ class Graph2D extends React.Component {
 
 
 export default Graph2D;
+
+
+
+function DarkModeSwitch({toggleThemeState}) {
+    return (
+        <div className='darkmodeswitch' onClick = {toggleThemeState}>
+            Explore CC
+        </div>
+    )
+}
