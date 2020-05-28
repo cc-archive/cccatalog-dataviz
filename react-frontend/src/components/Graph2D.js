@@ -4,6 +4,7 @@ import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
 import SearchFilterBox from './SearchFilterBox';
+import Sidebar from './Sidebar'
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json';
@@ -92,7 +93,7 @@ class Graph2D extends React.Component {
 
                     {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            
+                            <Sidebar isDarkMode={this.state.isDarkMode}/>
                             <div id="graph-canvas">
                                 <ForceGraph2D
                                     ref={this.graphRef}
