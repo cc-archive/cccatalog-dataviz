@@ -6,7 +6,23 @@ import ZoomToolkit from './ZoomToolkit';
 import SearchFilterBox from './SearchFilterBox';
 
 // source data
-const ENDPOINT = '../data/fdg_input_file.json'
+const ENDPOINT = '../data/fdg_input_file.json';
+
+const darkThemeData = {
+    'linkColor': 'rgba(196, 196, 196, 0.3)',
+    'hoverLinkColor': '#fff',
+    'graphCanvasColor': 'black',
+    'nodeFillColor': '#EFBE00',
+    'nodeTextColor': '#000'
+}
+
+const lightThemeData = {
+    'linkColor': '#D8D8D8',
+    'hoverLinkColor': '#2f4f4f',
+    'graphCanvasColor': 'white',
+    'nodeFillColor': '#ED592F',
+    'nodeTextColor': '#FFF'
+}
 
 class Graph2D extends React.Component {
     state = {
@@ -32,6 +48,7 @@ class Graph2D extends React.Component {
         currentZoomLevel: 1, // storing the current zoom level
         // !TODO: to be used for re-setting the state
         originalGraphData: null,
+        isDarkMode: true,
     }
 
     constructor(props) {
@@ -41,6 +58,18 @@ class Graph2D extends React.Component {
     }
 
     componentDidMount() {
+        // fetching value in data-theme key from localstorage
+        let theme = window.localStorage.getItem('data-theme');
+        if(!theme){
+            // data-theme key is not present in local storage
+            window.localStorage.setItem('data-theme', 'dark'); // dark || light
+        }
+        // setting data-theme attribute
+        document.documentElement.setAttribute('data-theme', theme);
+        // updating darkMode state 
+        this.setState({
+            isDarkMode: theme === 'dark'? true : false,
+        });
         // Fetching the data from source endpoint
         fetch(ENDPOINT)
             .then((res) => res.json())
@@ -50,7 +79,6 @@ class Graph2D extends React.Component {
                 })
                 this.simulateForceGraph(res);
             });
-
     }
 
     render() {
@@ -71,10 +99,10 @@ class Graph2D extends React.Component {
                                     graphData={this.state.graphData}
                                     onLinkHover={this.handleLinkHover}
                                     linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
-                                    linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 'white' : 'rgb(155, 216, 240, 0.25)'}
+                                    linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? (this.state.isDarkMode ? darkThemeData.hoverLinkColor : lightThemeData.hoverLinkColor) : (this.state.isDarkMode ? darkThemeData.linkColor : lightThemeData.linkColor)}
                                     nodeCanvasObjectMode={() => 'replace'}
                                     linkCanvasObjectMode={() => 'after'}
-                                    backgroundColor='#07263b'
+                                    backgroundColor={this.state.isDarkMode ? darkThemeData.graphCanvasColor : lightThemeData.graphCanvasColor}
                                     linkCanvasObject={this.handleLinkCanvasObject}
                                     onNodeClick={this.handleOnNodeClick}
                                     nodeLabel={(node) => `${node.id}`}
@@ -94,8 +122,6 @@ class Graph2D extends React.Component {
                         </div>
                     }
                 </div>
-
-
             </React.Fragment>
         )
     }
@@ -270,8 +296,8 @@ class Graph2D extends React.Component {
         var radius = node_size / 2;
         ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
         ctx.lineWidth = 0.5;//Math.min(globalScale*0.05,2);
-        ctx.fillStyle = '#32B2B0'; //fill color
-        ctx.strokeStyle = '#07263b'; //border color
+        ctx.fillStyle = this.state.isDarkMode ? darkThemeData.nodeFillColor : lightThemeData.nodeFillColor; //fill color
+        // ctx.strokeStyle = '#07263b'; //border color
         ctx.fill();
         ctx.stroke();
 
@@ -299,7 +325,7 @@ class Graph2D extends React.Component {
         //set bounds for the labels
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#D3D3D3'; // '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea
+        ctx.fillStyle = this.state.isDarkMode ? darkThemeData.nodeTextColor : lightThemeData.nodeTextColor; // '#279e9c'; //text color cream: #f2ebcf gray: #e9eaea
         ctx.fillText(label, node.x, node.y);
     }
 
