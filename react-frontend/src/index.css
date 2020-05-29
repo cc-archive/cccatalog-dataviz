@@ -500,7 +500,8 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 
 .actions-menu-item button:disabled {
   cursor: not-allowed;
-  background: #d8d8d8;
+  background: #a5a3a3;
+  color: black;
 }
 
 /* SIDEBAR END */

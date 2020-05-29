@@ -37,6 +37,7 @@ class Sidebar extends Component {
                     {this.state.isActionsActive &&
                         <ActionsMenu
                             handleSubmit={this.props.handleSubmit}
+                            processing={this.props.processing}
                             name={this.state.name}
                             setName={this.setName}
                             distance={this.state.distance}
@@ -52,7 +53,7 @@ export default Sidebar;
 
 
 function ActionsMenu(props) {
-    let { name, setName, distance, setDistance } = props;
+    let { name, setName, distance, setDistance, processing } = props;
 
     return (
         <div className='actions-menu-wrapper'>
@@ -66,7 +67,7 @@ function ActionsMenu(props) {
                     <input type='number' id='ac-item-nodeDistance' disabled={name === ''} onChange={(e) => setDistance(e.target.value)} value={distance} placeholder='5' />
                 </div>
                 <div className={`actions-menu-item ${name === '' || distance === '' ? 'disabled' : ''}`}>
-                    <button disabled={name === '' || distance === ''}>Filter Graph</button>
+                    <button disabled={name === '' || distance === '' || processing}>{processing ? 'Loading' : 'Filter Graph'}</button>
                 </div>
             </form>
         </div>

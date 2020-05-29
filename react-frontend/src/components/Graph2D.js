@@ -3,11 +3,11 @@ import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
-import SearchFilterBox from './SearchFilterBox';
 import Sidebar from './Sidebar'
 
 // source data
 const ENDPOINT = '../data/fdg_input_file.json';
+const SERVER_BASE_ENDPOINT = 'https://ccdataviz.ue.r.appspot.com/api/graph-data';
 
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',
@@ -50,6 +50,8 @@ class Graph2D extends React.Component {
         // !TODO: to be used for re-setting the state
         originalGraphData: null,
         isDarkMode: true,
+        // Show processing 
+        processing: false,
     }
 
     constructor(props) {
@@ -61,7 +63,7 @@ class Graph2D extends React.Component {
     componentDidMount() {
         // fetching value in data-theme key from localstorage
         let theme = window.localStorage.getItem('data-theme');
-        if(!theme){
+        if (!theme) {
             // data-theme key is not present in local storage
             window.localStorage.setItem('data-theme', 'dark'); // dark || light
         }
@@ -69,7 +71,7 @@ class Graph2D extends React.Component {
         document.documentElement.setAttribute('data-theme', theme);
         // updating darkMode state 
         this.setState({
-            isDarkMode: theme === 'dark'? true : false,
+            isDarkMode: theme === 'dark' ? true : false,
         });
         // Fetching the data from source endpoint
         fetch(ENDPOINT)
@@ -86,14 +88,14 @@ class Graph2D extends React.Component {
         return (
             <React.Fragment>
                 {/* <SearchFilterBox handleSubmit={this.handleFilterSubmit} /> */}
-                <DarkModeSwitch toggleThemeState= {this.toggleThemeHandler}/>
+                <DarkModeSwitch toggleThemeState={this.toggleThemeHandler} />
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
                     {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            <Sidebar isDarkMode={this.state.isDarkMode} handleSubmit={this.handleFilterSubmit}/>
+                            <Sidebar isDarkMode={this.state.isDarkMode} handleSubmit={this.handleFilterSubmit} processing={this.state.processing} />
                             <div id="graph-canvas">
                                 <ForceGraph2D
                                     ref={this.graphRef}
@@ -130,7 +132,7 @@ class Graph2D extends React.Component {
     toggleThemeHandler = () => {
         let newTheme = this.state.isDarkMode ? 'light' : 'dark';
         this.setState({
-            isDarkMode : newTheme === 'dark' ? true : false,
+            isDarkMode: newTheme === 'dark' ? true : false,
         })
         window.localStorage.setItem('data-theme', newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
@@ -174,8 +176,41 @@ class Graph2D extends React.Component {
         })
     }
 
+    // server side filtering
+    fetchFilteredData = async (nodeName, distance) => {
+        nodeName = nodeName.toLowerCase();
+        this.setState({
+            processing: true,
+        })
+        try {
+            let res = await fetch(`${SERVER_BASE_ENDPOINT}?name=${nodeName}&distance=${distance}`);
+            let jsonData = await res.json();
+
+            if (jsonData['error']) {
+                this.setState({
+                    processing: false
+                })
+                alert(`Error Occurred: ${jsonData['message']}`)
+            } else {
+                this.simulateForceGraph(jsonData);
+                setTimeout(() => {
+                    this.graphRef.current.zoomToFit(1000, 10)
+                }, 500)
+                this.setState({
+                    processing: false
+                })
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
     // Handles Filtering by node name and distance
-    handleFilterSubmit = ({ name: startNode, distance }) => {
+    handleFilterSubmit = (payload) => {
+        this.fetchFilteredData(payload.name, payload.distance);
+    }
+
+    // client side filtering
+    handleClientSideFiltering = ({ name: startNode, distance }) => {
         startNode = startNode.toLowerCase();
         if (this.state.linksPerDomains[startNode]) {
             distance = distance.toLowerCase()
@@ -239,7 +274,7 @@ class Graph2D extends React.Component {
     }
 
     handleOnNodeClick = (node) => {
-        if(node){
+        if (node) {
             this.graphRef.current.centerAt(node.x, node.y, 1000);
             this.graphRef.current.zoom(5, 2000);
             setTimeout(() => {
@@ -250,7 +285,7 @@ class Graph2D extends React.Component {
                 document.body.classList.add('modal-active');
             }, 500);
         }
-            
+
     }
 
     handleOnNodeHover = node => {
@@ -386,9 +421,9 @@ export default Graph2D;
 
 
 
-function DarkModeSwitch({toggleThemeState}) {
+function DarkModeSwitch({ toggleThemeState }) {
     return (
-        <div className='darkmodeswitch' onClick = {toggleThemeState}>
+        <div className='darkmodeswitch' onClick={toggleThemeState}>
             Explore CC
         </div>
     )
