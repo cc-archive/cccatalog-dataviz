@@ -26,10 +26,18 @@ def getFilteredData(db, nodeName, distance):
                 links.append({**k, "source": j['target'] })
     
     # Adding nodes metadata
+    added_nodes_id = []
+    # Adding root node metadata
     nodes.append(nodeDistanceList['metadata'])
     for i in links:
-        if not i in nodes:
+        # checking if target metadata is in nodes list
+        if not i['target'] in added_nodes_id:
             nodes.append(db[i['target']]['metadata'])
+            added_nodes_id.append(i['target'])
+        # checking if source metadata is in nodes list
+        if not i['source'] in added_nodes_id:
+            nodes.append(db[i['source']]['metadata'])
+            added_nodes_id.append(i['target'])
 
     return {'links': links, 'nodes': nodes}
 
