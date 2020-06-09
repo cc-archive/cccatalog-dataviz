@@ -3,21 +3,25 @@ from django.http import JsonResponse, FileResponse
 import shelve
 
 MAX_DISTANCE = 10
-OUTPUT_FILE_NAME = 'fdg_output_file'
+OUTPUT_FILE_PATH = 'dataviz_api/data/fdg_output_file'
 
-'''
-Filters the Graph using nodeName and distance
-'''
-def getFilteredData(db, nodeName, distance):
+def get_filtered_data(db, node_name, distance):
+    """Filters the Graph using node_name and distance
+
+    Keyword arguments:
+    db -- database instance
+    node_name -- id of the root node
+    distance -- maximum level upto which nodes should be considered
+    """
     nodes = []
     links = []
-    nodeDistanceList = db[nodeName]
+    node_distance_list = db[node_name]
     # Iterating over all nodes which are at a distance of [1, distance] 
     for i in range(1, distance+1):
         # For all links at a distance of "i"
-        for j in nodeDistanceList[str(i)]:
+        for j in node_distance_list[str(i)]:
             # Appending to the links list
-            links.append({**j, "source": nodeName})
+            links.append({**j, "source": node_name})
             # If "i" is at the last level then not adding distance one links
             if(i == distance):
                 continue
@@ -28,8 +32,8 @@ def getFilteredData(db, nodeName, distance):
     # Adding nodes metadata
     added_nodes_id = []
     # Adding root node metadata
-    nodes.append(nodeDistanceList['metadata'])
-    added_nodes_id.append(nodeName)
+    nodes.append(node_distance_list['metadata'])
+    added_nodes_id.append(node_name)
     for i in links:
         # checking if target metadata is in nodes list
         if not i['target'] in added_nodes_id:
@@ -43,21 +47,19 @@ def getFilteredData(db, nodeName, distance):
     return {'links': links, 'nodes': nodes}
 
 
-'''
-Serves Graph Data
-'''
 def serve_graph_data(request):
+    """Serves Graph Data"""
     # Retrieving node name params
-    nodeName = request.GET.get('name')
+    node_name = request.GET.get('name')
 
     # If node name is not provided sending whole file
-    if(nodeName == None):
-        data = open('api/data/'+OUTPUT_FILE_NAME+'.json', 'rb')
+    if(node_name == None):
+        data = open(OUTPUT_FILE_PATH+'.json', 'rb')
         return FileResponse(data)
 
-    with shelve.open('api/data/'+OUTPUT_FILE_NAME, writeback=False) as db:
-        if( not nodeName in db ):
-            return JsonResponse({"error": True, "message": "node " + nodeName + " doesn't exist"}, json_dumps_params={'indent': 4})
+    with shelve.open(OUTPUT_FILE_PATH, writeback=False) as db:
+        if( not node_name in db ):
+            return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 4})
 
         # Retrieving distance params 
         distance = request.GET.get('distance')
@@ -66,7 +68,7 @@ def serve_graph_data(request):
         else:
             distance = min(int(distance), MAX_DISTANCE)
 
-        getData = getFilteredData(db, nodeName, distance)
+        getData = get_filtered_data(db, node_name, distance)
         db.close()
         return JsonResponse(getData, json_dumps_params={'indent': 4})
 

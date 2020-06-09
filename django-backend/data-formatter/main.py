@@ -21,7 +21,7 @@ MAX_DISTANCE = 10
 '''
 Builds schema for an individual node
 '''
-def buildSchema(distance):
+def build_schema(distance):
     schema = {}
     for i in range(distance):
         schema[str(i+1)] = []
@@ -30,31 +30,31 @@ def buildSchema(distance):
 '''
 Converts the {'nodes': [], 'links': []} into Adjancency List
 '''
-def createAdjacencyList(aggregate_data):
+def create_adjacency_list(aggregate_data):
     links = aggregate_data['links']
-    adjacencyList = {}
+    adjacency_list = {}
 
     for link in links:
         key = link['source']
-        if not key in adjacencyList:
-            adjacencyList[key] = []
-        if not link['target'] in adjacencyList:
-            adjacencyList[link['target']] = []
+        if not key in adjacency_list:
+            adjacency_list[key] = []
+        if not link['target'] in adjacency_list:
+            adjacency_list[link['target']] = []
 
-        adjacencyList[key].append({
+        adjacency_list[key].append({
             "target": link['target'],
             "value": link['value']
         })
-    return adjacencyList
+    return adjacency_list
 
 
 '''
 Breadth First Search Traversal 
 '''
-def bfs(adjList, node):
+def bfs(adj_list, node):
     visited = []
     visited.append(node)
-    distanceList = copy.deepcopy(schema)
+    distance_list = copy.deepcopy(schema)
     q = []
     q.append({"node": node, "level": 0})
     while q:
@@ -63,18 +63,18 @@ def bfs(adjList, node):
         currLevel = front['level']
         if(int(currLevel) >= MAX_DISTANCE):
             continue
-        for i in adjList[currNode]:
+        for i in adj_list[currNode]:
             if not i in visited:
                 q.append({'node': i['target'], 'level': currLevel+1})
-                distanceList[str(currLevel+1)].append(i)
+                distance_list[str(currLevel+1)].append(i)
                 visited.append(i)
 
-    return distanceList
+    return distance_list
 
 '''
 Creates a python dictionary and dumps a JSON object
 '''
-def dumpJSON(output_list):
+def dump_json(output_list):
     json_output_list = {}
     for key in output_list:
         json_output_list[key] = output_list[key]
@@ -84,21 +84,21 @@ def dumpJSON(output_list):
 
 
 # Building schema
-schema = buildSchema(MAX_DISTANCE)
+schema = build_schema(MAX_DISTANCE)
 
 # Loading Input File
 input_file = open(INPUT_FILE_NAME).read()
 aggregate_data = json.loads(input_file)
 # Building Adjacency List
-adjacencyList = createAdjacencyList(aggregate_data)
+adjacency_list = create_adjacency_list(aggregate_data)
 
 # Opening shelve instance
 output_list = shelve.open(OUTPUT_FILE_NAME, writeback=True)
 
 # Calling BFS on every node and adding the nodes inside output_list
-for node in adjacencyList:
+for node in adjacency_list:
     # calling bfs from node
-    distance_list_of_node = bfs(adjacencyList, node)
+    distance_list_of_node = bfs(adjacency_list, node)
     # adding to output_list
     output_list[node] = distance_list_of_node
 
@@ -116,14 +116,13 @@ for node in nodes:
         # Appending all redundant nodes
         redundant_nodes.append(e.args[0])
 
-# DEBUG: print('REDUNDANT_NODES: ', redundant_nodes, len(redundant_nodes))
+# DEBUG: 
+# print('REDUNDANT_NODES: ', redundant_nodes, len(redundant_nodes))
 
 output_list.sync()
 
 # Uncomment this to output JSON file too
-# dumpJSON(output_list)
+dump_json(output_list)
 
 
 output_list.close()
-
-

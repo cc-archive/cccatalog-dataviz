@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k7wv@iw4nn9e2zzctd_1z=h91tzkaax#%dj!+vdu7!x2bu)ja$'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    'dataviz_api',
     'corsheaders',
 ]
 
@@ -54,8 +54,8 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
-    "https://ccdataviz.netlify.app/",
+    "http://127.0.0.1:3000",
+    "https://ccdataviz.netlify.app",
 ]
 
 ROOT_URLCONF = 'linked_commons.urls'

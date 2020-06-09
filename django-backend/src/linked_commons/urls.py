@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from api import urls as apiUrls
+from dataviz_api import urls as dataviz_api_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(apiUrls)),
+    path('api/', include(dataviz_api_urls)),
 ]
