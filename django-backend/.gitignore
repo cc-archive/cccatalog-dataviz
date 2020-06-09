@@ -1,7 +1,7 @@
 data-formatter/*.json
-data-formatter/*.bak
-data-formatter/*.dat
-data-formatter/*.dir
+*.bak
+*.dat
+*.dir
 
 
 
