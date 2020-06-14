@@ -1,13 +1,5 @@
-'''
-
-The following file is a parser which converts the input data schema from {nodes:[], links:[]} to the distance list format.
-
-'''
-
 import shelve
-# For DeepCopy
 import copy
-# For JSON file output
 import json
 
 # INPUT DATA SOURCE FILENAME
@@ -18,19 +10,19 @@ MAX_DISTANCE = 10
 
 
 
-'''
-Builds schema for an individual node
-'''
 def build_schema(distance):
+    """
+    Builds schema for an individual node
+    """
     schema = {}
     for i in range(distance):
         schema[str(i+1)] = []
     return schema
 
-'''
-Converts the {'nodes': [], 'links': []} into Adjancency List
-'''
 def create_adjacency_list(aggregate_data):
+    """
+    Converts the {'nodes': [], 'links': []} into Adjancency List
+    """
     links = aggregate_data['links']
     adjacency_list = {}
 
@@ -48,10 +40,10 @@ def create_adjacency_list(aggregate_data):
     return adjacency_list
 
 
-'''
-Breadth First Search Traversal 
-'''
 def bfs(adj_list, node):
+    """
+    Breadth First Search Traversal 
+    """
     visited = []
     visited.append(node)
     distance_list = copy.deepcopy(schema)
@@ -71,10 +63,10 @@ def bfs(adj_list, node):
 
     return distance_list
 
-'''
-Creates a python dictionary and dumps a JSON object
-'''
 def dump_json(output_list):
+    """
+    Creates a python dictionary and dumps a JSON object
+    """
     json_output_list = {}
     for key in output_list:
         json_output_list[key] = output_list[key]

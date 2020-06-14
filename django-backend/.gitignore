@@ -3,13 +3,6 @@ data-formatter/*.json
 *.dat
 *.dir
 
-
-
-
-# Created by https://www.gitignore.io/api/django
-# Edit at https://www.gitignore.io/?templates=django
-
-### Django ###
 *.log
 *.pot
 *.pyc
@@ -19,11 +12,6 @@ db.sqlite3
 db.sqlite3-journal
 media
 
-# If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
-# in your Git repository. Update and uncomment the following line accordingly.
-# <django-project-name>/staticfiles/
-
-### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
@@ -90,13 +78,6 @@ target/
 # pyenv
 .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
 # celery beat schedule file
 celerybeat-schedule
 
@@ -125,5 +106,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# End of https://www.gitignore.io/api/django
