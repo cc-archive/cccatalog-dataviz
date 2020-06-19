@@ -50,6 +50,7 @@ body.modal-active .content-wrapper .graph-wrapper {
   cursor: pointer;
 }
 
+/* INFO BOX */
 .infoBox {
   position: fixed;
   top: 30vh;
@@ -60,6 +61,7 @@ body.modal-active .content-wrapper .graph-wrapper {
   z-index: 10;
   color: white;
 }
+/* INFO BOX END */
 
 /* ZOOM TOOLKIT BEGIN */
 .zoomtoolkit-wrapper {
@@ -372,12 +374,16 @@ html[data-theme="dark"] .darkmodeswitch {
 /* SIDEBAR BEGIN */
 
 .sidebar-wrapper {
-  position: absolute;
+  position: fixed;
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   width: 22%;
   min-width: 150px;
   z-index: 100;
-  height: 100vh;
+  height: 100vh !important;
+  overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -394,7 +400,9 @@ html[data-theme="light"] .sidebar-wrapper {
 .sidebar-wrapper .cc-logo {
   width: calc(100% - 0.2rem);
   padding: 0 0.1rem;
-  margin: 50px 0;
+  margin-top: 2rem;
+  margin-bottom: 5rem;
+  max-height: 50px;
 }
 
 .sidebar-wrapper .project-info .project-heading {
@@ -437,6 +445,9 @@ html[data-theme="light"] .sidebar-wrapper .action-btn {
 .sidebar-wrapper svg {
   width: inherit;
 }
+/* .actions-link{
+  margin-bottom: auto;
+} */
 
 .actions-menu-wrapper {
   margin: 0.4rem 0.8rem;
@@ -482,8 +493,8 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 .actions-menu-item button {
   background: #ed592f;
   border-radius: 4px;
-  margin: 0.5rem 0;
-  padding: 16px 20px;
+  margin: 0.7rem 0;
+  padding: 13px 20px;
   border: none;
   outline: none;
   font-family: Roboto Condensed;

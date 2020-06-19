@@ -6,7 +6,6 @@ import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar'
 
 // source data
-const ENDPOINT = '../data/fdg_input_file.json';
 const SERVER_BASE_ENDPOINT = 'https://ccdataviz.ue.r.appspot.com/api/graph-data';
 
 const darkThemeData = {
@@ -47,8 +46,6 @@ class Graph2D extends React.Component {
         linkName: 'null_null',
         // set the inital value of zoom
         currentZoomLevel: 1, // storing the current zoom level
-        // !TODO: to be used for re-setting the state
-        originalGraphData: null,
         isDarkMode: true,
         // Show processing 
         processing: false,
@@ -75,12 +72,9 @@ class Graph2D extends React.Component {
             isDarkMode: theme === 'dark' ? true : false,
         });
         // Fetching the data from source endpoint
-        fetch(ENDPOINT)
+        fetch(SERVER_BASE_ENDPOINT)
             .then((res) => res.json())
             .then(res => {
-                this.setState({
-                    originalGraphData: res,
-                })
                 this.simulateForceGraph(res);
             });
     }
@@ -88,13 +82,12 @@ class Graph2D extends React.Component {
     render() {
         return (
             <React.Fragment>
-                {/* <SearchFilterBox handleSubmit={this.handleFilterSubmit} /> */}
                 <DarkModeSwitch toggleThemeState={this.toggleThemeHandler} />
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
-                    {this.state.loading ? <h1 style={{ textAlign: "center" }}>loading...</h1> :
+                    {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
                         <div className='graph-wrapper'>
                             <Sidebar isDarkMode={this.state.isDarkMode} handleSubmit={this.handleFilterSubmit} processing={this.state.processing} />
                             <div id="graph-canvas">

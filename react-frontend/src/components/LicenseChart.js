@@ -8,7 +8,6 @@ Exporting(ReactHighcharts.Highcharts);
 class LicenseChart extends React.Component {
     render() {
         let { node } = this.props;
-        console.log("NEW:", node);
         return (
             <React.Fragment>
                 <div id="licensechart">
