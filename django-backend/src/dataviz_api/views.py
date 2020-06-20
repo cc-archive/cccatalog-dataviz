@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse, FileResponse
 import shelve
+from dataviz_api.models import Node
+
 
 MAX_DISTANCE = 10
 OUTPUT_FILE_PATH = 'dataviz_api/data/fdg_output_file'
@@ -73,3 +75,15 @@ def serve_graph_data(request):
         return JsonResponse(getData, json_dumps_params={'indent': 4})
 
     return JsonResponse({"error": "true", "message": "Server Error"})
+
+
+
+
+def serve_suggestions(request):
+    query = request.GET.get('q')
+    if( query ):
+        query_set = Node.objects.filter(index__icontains=query)
+        query_set = query_set[:8]
+        return JsonResponse({"error": False, "suggestions":list(query_set.values()) }, json_dumps_params={'indent': 4})
+    else:
+        return JsonResponse({"error": True, "message": "No query params passed" })

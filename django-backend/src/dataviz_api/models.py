@@ -1,3 +1,7 @@
 from django.db import models
 
-# Create your models here.
+
+class Node(models.Model):
+    id = models.CharField(max_length=1000)
+    provider_domain = models.CharField(max_length=1000)
+    index = models.CharField(max_length=1000, primary_key=True)
