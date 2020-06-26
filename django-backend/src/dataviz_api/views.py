@@ -82,7 +82,7 @@ def serve_graph_data(request):
 def serve_suggestions(request):
     query = request.GET.get('q')
     if( query ):
-        query_set = Node.objects.filter(index__icontains=query)
+        query_set = Node.objects.filter(provider_domain__icontains=query)
         query_set = query_set[:8]
         return JsonResponse({"error": False, "suggestions":list(query_set.values()) }, json_dumps_params={'indent': 4})
     else:
