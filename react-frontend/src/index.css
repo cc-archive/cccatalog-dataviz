@@ -519,3 +519,11 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 }
 
 /* SIDEBAR END */
+
+
+[data-reach-popover] {
+  z-index: 100;
+}
+[data-reach-combobox-option] {
+  padding: 6px !important;
+}

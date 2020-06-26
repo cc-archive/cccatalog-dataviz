@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ReactComponent as LightLogo } from '../assets/logo/light-logo.svg';
 import { ReactComponent as DarkLogo } from '../assets/logo/dark-logo.svg';
-
+import InputSuggest from './InputSuggest'
 
 class Sidebar extends Component {
     state = {
@@ -60,7 +60,7 @@ function ActionsMenu(props) {
             <form onSubmit={(e) => { e.preventDefault(); props.handleSubmit({ name, distance }) }}>
                 <div className='actions-menu-item'>
                     <label htmlFor='ac-item-graphNodeName'>Name</label>
-                    <input type='text' id='ac-item-graphNodeName' onChange={(e) => setName(e.target.value)} placeholder='icij' value={name} />
+                    <InputSuggest id='ac-item-graphNodeName' setName={setName} placeholder='icij' value={name} />
                 </div>
                 <div className={`actions-menu-item ${name === '' ? 'disabled' : ''}`}>
                     <label htmlFor='ac-item-nodeDistance'>Distance</label>
