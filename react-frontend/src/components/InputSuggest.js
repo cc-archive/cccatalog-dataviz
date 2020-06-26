@@ -29,7 +29,7 @@ class InputSuggest extends Component {
                     suggestions: this.state.cache[value]
                 });
             } else {
-                let res = await fetch(`https://ccdataviz.ue.r.appspot.com/api/suggestions/?q=${value}`);
+                let res = await fetch(`${this.props.SERVER_BASE_URL}/suggestions/?q=${value}`);
                 let jsonData = await res.json();
                 if (jsonData['error']) {
                     this.setState({
