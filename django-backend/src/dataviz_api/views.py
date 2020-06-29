@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, FileResponse
 import shelve
 from dataviz_api.models import Node
+import random
 
 
 MAX_DISTANCE = 10
@@ -82,8 +83,10 @@ def serve_graph_data(request):
 def serve_suggestions(request):
     query = request.GET.get('q')
     if( query ):
-        query_set = Node.objects.filter(provider_domain__icontains=query)
-        query_set = query_set[:8]
-        return JsonResponse({"error": False, "suggestions":list(query_set.values()) }, json_dumps_params={'indent': 4})
+        query_set = list(Node.objects.filter(provider_domain__icontains=query).values())
+        if(len(query_set) > 8):
+            random.shuffle(query_set)
+            query_set = query_set[:8]
+        return JsonResponse({"error": False, "suggestions":query_set }, json_dumps_params={'indent': 4})
     else:
         return JsonResponse({"error": True, "message": "No query params passed" })
