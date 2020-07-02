@@ -19,7 +19,6 @@ def get_filtered_data(db, node_name, distance):
     links = []
     nodes = []
     node_distance_list = db[node_name]
-    # Iterating over all nodes which are at a distance of [1, distance] 
 
     # Adding nodes at distance 1
     for i in node_distance_list['1']:

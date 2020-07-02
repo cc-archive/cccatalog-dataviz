@@ -4,7 +4,7 @@ import json
 import datetime
 
 # INPUT DATA SOURCE FILENAME
-INPUT_FILE_NAME = 'fdg_input_file.json'
+INPUT_FILE_NAME = 'test.json'
 OUTPUT_FILE_NAME = 'fdg_output_file'
 
 # Maximum distance to be considered
@@ -67,13 +67,15 @@ def build_distance_list(adj_list, node, visited, distance_list):
                     distance_list[j[1]] = copy.deepcopy(schema)
 
                 if j[0]==0:
+                    # If the distance (j[0]+1) is one from the j[1] node. Pushing the nodeName and the value/weight of the link 
                   distance_list[j[1]]['1'].append(i)
                 else:
+                    # If the distance is > 1. Pushing only nodeName
                   distance_list[j[1]][str(j[0]+1)].append(i['target'])
             
-            # Checking if the node is already already travered or not
+            # Checking if the node is already travered or not
             if not i['target'] in visited:
-                q.append({'node': i['target'], 'parent': parent})
+                q.append({'node': i['target'], 'parent': copy.deepcopy(parent)})
                 visited.add(i['target'])
 
     return distance_list
@@ -105,7 +107,7 @@ display_time("Data Loaded")
 # Building Adjacency List
 adjacency_list = create_adjacency_list(aggregate_data)
 curr_time = datetime.datetime.now()
-display_time("Adjacency List Successfuly Built")
+display_time("Adjacency List Successfully Built")
 
 temp_output_list = {}
 
@@ -118,7 +120,7 @@ for node in adjacency_list:
         # calling build_distance_list from node
         build_distance_list(adjacency_list, node, visited, temp_output_list)
 
-display_time("Distance List Successfuly Built")
+display_time("Distance List Successfully Built")
 
 
 # Opening shelve instance
@@ -134,8 +136,10 @@ for node in nodes:
         temp_output_list[node['id']] = copy.deepcopy(schema)
         zero_indeg_nodes.append(node['id'])
     temp_output_list[node['id']]['metadata'] = node
-    output_list[node['id']] = temp_output_list[node['id']]
+    # output_list[node['id']] = temp_output_list[node['id']]
 
+
+output_list.update(temp_output_list)
 
 # DEBUG: 
 # print('zero_indeg_nodes: ', len(zero_indeg_nodes))
