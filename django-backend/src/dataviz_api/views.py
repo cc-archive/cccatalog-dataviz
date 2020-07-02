@@ -4,7 +4,6 @@ import shelve
 from dataviz_api.models import Node
 import random
 
-
 MAX_DISTANCE = 10
 OUTPUT_FILE_PATH = 'dataviz_api/data/fdg_output_file'
 
@@ -16,36 +15,33 @@ def get_filtered_data(db, node_name, distance):
     node_name -- id of the root node
     distance -- maximum level upto which nodes should be considered
     """
-    nodes = []
+    nodes_id = {node_name}
     links = []
+    nodes = []
     node_distance_list = db[node_name]
     # Iterating over all nodes which are at a distance of [1, distance] 
-    for i in range(1, distance+1):
-        # For all links at a distance of "i"
-        for j in node_distance_list[str(i)]:
-            # Appending to the links list
-            links.append({**j, "source": node_name})
-            # If "i" is at the last level then not adding distance one links
-            if(i == distance):
-                continue
-            # For all target nodes adding their distance one links
-            for k in db[j['target']]['1']:
-                links.append({**k, "source": j['target'] })
+
+    # Adding nodes at distance 1
+    for i in node_distance_list['1']:
+        nodes_id.add(i['target'])
     
+    # Adding nodes from distance [2, distance-1]
+    for i in range(2, distance):
+        nodes_id.update(node_distance_list[str(i)])
+
+    # Adding links
+    for i in nodes_id:
+        for k in db[i]['1']:
+            links.append({**k, "source": i })
+
+
+    # Adding trail nodes at [distance] from node_name
+    nodes_id.update(node_distance_list[str(distance)])
+
     # Adding nodes metadata
-    added_nodes_id = []
-    # Adding root node metadata
-    nodes.append(node_distance_list['metadata'])
-    added_nodes_id.append(node_name)
-    for i in links:
-        # checking if target metadata is in nodes list
-        if not i['target'] in added_nodes_id:
-            nodes.append(db[i['target']]['metadata'])
-            added_nodes_id.append(i['target'])
-        # checking if source metadata is in nodes list
-        if not i['source'] in added_nodes_id:
-            nodes.append(db[i['source']]['metadata'])
-            added_nodes_id.append(i['source'])
+    for node in nodes_id:
+        nodes.append(db[node]['metadata'])
+
 
     return {'links': links, 'nodes': nodes}
 
@@ -54,6 +50,7 @@ def serve_graph_data(request):
     """Serves Graph Data"""
     # Retrieving node name params
     node_name = request.GET.get('name')
+    print(node_name)
 
     # If node name is not provided sending whole file
     if(node_name == None):
@@ -73,7 +70,7 @@ def serve_graph_data(request):
 
         getData = get_filtered_data(db, node_name, distance)
         db.close()
-        return JsonResponse(getData, json_dumps_params={'indent': 4})
+        return JsonResponse(getData)
 
     return JsonResponse({"error": "true", "message": "Server Error"})
 
