@@ -24,7 +24,6 @@ class InputSuggest extends Component {
         value = value.trim().toLowerCase();
         if (value) {
             if (this.state.cache[value]) {
-                console.log("this.state.cache SAVED");
                 this.setState({
                     suggestions: this.state.cache[value]
                 });

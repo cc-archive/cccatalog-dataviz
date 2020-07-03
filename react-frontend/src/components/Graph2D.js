@@ -6,7 +6,7 @@ import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar'
 
 // source data
-const SERVER_BASE_ENDPOINT = 'https://ccdataviz.ue.r.appspot.com/api';
+const SERVER_BASE_ENDPOINT = process.env.REACT_APP_SERVER_BASE_ENDPOINT;
 
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',

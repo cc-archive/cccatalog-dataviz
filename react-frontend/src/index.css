@@ -526,4 +526,5 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 }
 [data-reach-combobox-option] {
   padding: 6px !important;
+  overflow: hidden;
 }
