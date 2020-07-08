@@ -113,8 +113,8 @@ for node in nodes:
 
 output_list.sync()
 
-# Uncomment this to output JSON file too
-dump_json(output_list)
+# Uncomment this to output JSON file [Only to visualize the data]
+# dump_json(output_list)
 
 
 output_list.close()

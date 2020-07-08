@@ -6,7 +6,7 @@ import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar'
 
 // source data
-const SERVER_BASE_ENDPOINT = 'https://ccdataviz.ue.r.appspot.com/api/graph-data';
+const SERVER_BASE_ENDPOINT = process.env.REACT_APP_SERVER_BASE_ENDPOINT;
 
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',
@@ -63,7 +63,7 @@ class Graph2D extends React.Component {
         if (!theme) {
             // data-theme key is not present in local storage
             window.localStorage.setItem('data-theme', 'dark'); // dark || light
-            theme='dark';
+            theme = 'dark';
         }
         // setting data-theme attribute
         document.documentElement.setAttribute('data-theme', theme);
@@ -72,7 +72,7 @@ class Graph2D extends React.Component {
             isDarkMode: theme === 'dark' ? true : false,
         });
         // Fetching the data from source endpoint
-        fetch(SERVER_BASE_ENDPOINT)
+        fetch(`${SERVER_BASE_ENDPOINT}/graph-data`)
             .then((res) => res.json())
             .then(res => {
                 this.simulateForceGraph(res);
@@ -89,7 +89,12 @@ class Graph2D extends React.Component {
 
                     {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            <Sidebar isDarkMode={this.state.isDarkMode} handleSubmit={this.handleFilterSubmit} processing={this.state.processing} />
+                            <Sidebar
+                                isDarkMode={this.state.isDarkMode}
+                                handleSubmit={this.handleFilterSubmit}
+                                processing={this.state.processing}
+                                SERVER_BASE_URL={SERVER_BASE_ENDPOINT}
+                            />
                             <div id="graph-canvas">
                                 <ForceGraph2D
                                     ref={this.graphRef}
@@ -177,7 +182,7 @@ class Graph2D extends React.Component {
             processing: true,
         })
         try {
-            let res = await fetch(`${SERVER_BASE_ENDPOINT}?name=${nodeName}&distance=${distance}`);
+            let res = await fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=${nodeName}&distance=${distance}`);
             let jsonData = await res.json();
 
             if (jsonData['error']) {
