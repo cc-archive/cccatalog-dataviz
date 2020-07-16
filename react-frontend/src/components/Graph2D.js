@@ -176,13 +176,13 @@ class Graph2D extends React.Component {
     }
 
     // server side filtering
-    fetchFilteredData = async (nodeName, distance) => {
+    fetchFilteredData = async (nodeName) => {
         nodeName = nodeName.toLowerCase();
         this.setState({
             processing: true,
         })
         try {
-            let res = await fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=${nodeName}&distance=${distance}`);
+            let res = await fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=${nodeName}`);
             let jsonData = await res.json();
 
             if (jsonData['error']) {
@@ -203,46 +203,11 @@ class Graph2D extends React.Component {
             console.log(err);
         }
     }
-    // Handles Filtering by node name and distance
+    // Handles Filtering by node name
     handleFilterSubmit = (payload) => {
-        this.fetchFilteredData(payload.name, payload.distance);
+        this.fetchFilteredData(payload.name);
     }
 
-    // client side filtering
-    handleClientSideFiltering = ({ name: startNode, distance }) => {
-        startNode = startNode.toLowerCase();
-        if (this.state.linksPerDomains[startNode]) {
-            distance = distance.toLowerCase()
-            let visited = new Map();
-            let links = [];
-            distance = parseInt(distance);
-            this.searchNodesInDepth(this.state.linksPerDomains, startNode, visited, distance, 0, links);
-            let nodes = [];
-            let masterNodes = this.state.graphData['nodes'];
-            let n = masterNodes.length;
-            visited.clear();
-            links.forEach((link) => {
-                for (let i = 0; i < n; i++) {
-                    if ((!visited.has(link['source']) && masterNodes[i]['id'] === link['source'])) {
-                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] });
-                        visited.set(link['source'], true);
-                    }
-                    if (!visited.has(link['target']) && masterNodes[i]['id'] === link['target']) {
-                        nodes.push({ ...masterNodes[i], node_size: masterNodes[i]['node_size'] });
-                        visited.set(link['target'], true);
-                    }
-                }
-            });
-            this.simulateForceGraph({ links, nodes });
-            // A nice animated zooming effect into the filtered graph
-            setTimeout(() => {
-                this.graphRef.current.zoomToFit(1000, 10)
-            }, 500)
-        } else {
-            // Invalid
-            alert('Invalid Node Name');
-        }
-    }
 
     handleZoomOut = () => {
         // Decrementing zoom level by zoom step

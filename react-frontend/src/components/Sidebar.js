@@ -7,18 +7,11 @@ class Sidebar extends Component {
     state = {
         'isActionsActive': true,
         'name': '',
-        'distance': ''
     }
 
     setName = (newVal) => {
         this.setState({
             name: newVal
-        })
-    }
-
-    setDistance = (newVal) => {
-        this.setState({
-            distance: newVal
         })
     }
 
@@ -40,8 +33,6 @@ class Sidebar extends Component {
                             processing={this.props.processing}
                             name={this.state.name}
                             setName={this.setName}
-                            distance={this.state.distance}
-                            setDistance={this.setDistance}
                             SERVER_BASE_URL={this.props.SERVER_BASE_URL} />}
                 </div>
             </div>
@@ -54,21 +45,17 @@ export default Sidebar;
 
 
 function ActionsMenu(props) {
-    let { name, setName, distance, setDistance, processing, SERVER_BASE_URL } = props;
+    let { name, setName, processing, SERVER_BASE_URL } = props;
 
     return (
         <div className='actions-menu-wrapper'>
-            <form onSubmit={(e) => { e.preventDefault(); props.handleSubmit({ name, distance }) }} autoComplete='off'>
+            <form onSubmit={(e) => { e.preventDefault(); props.handleSubmit({ name }) }} autoComplete='off'>
                 <div className='actions-menu-item'>
                     <label htmlFor='ac-item-graphNodeName'>Name</label>
                     <InputSuggest id='ac-item-graphNodeName' setName={setName} placeholder='icij' value={name} SERVER_BASE_URL={SERVER_BASE_URL}/>
                 </div>
                 <div className={`actions-menu-item ${name === '' ? 'disabled' : ''}`}>
-                    <label htmlFor='ac-item-nodeDistance'>Distance</label>
-                    <input type='number' id='ac-item-nodeDistance' disabled={name === ''} onChange={(e) => setDistance(e.target.value)} value={distance} placeholder='5' />
-                </div>
-                <div className={`actions-menu-item ${name === '' || distance === '' ? 'disabled' : ''}`}>
-                    <button disabled={name === '' || distance === '' || processing}>{processing ? 'Loading' : 'Filter Graph'}</button>
+                    <button disabled={name === '' || processing}>{processing ? 'Loading' : 'Filter Graph'}</button>
                 </div>
             </form>
         </div>
