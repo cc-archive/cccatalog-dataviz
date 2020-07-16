@@ -4,38 +4,23 @@ import shelve
 from dataviz_api.models import Node
 import random
 
-MAX_DISTANCE = 10
-OUTPUT_FILE_PATH = 'dataviz_api/data/fdg_output_file'
+MAX_DISTANCE = 1
+OUTPUT_FILE_PATH = 'dataviz_api/data/graph_dB'
 
-def get_filtered_data(db, node_name, distance):
-    """Filters the Graph using node_name and distance
-
-    Keyword arguments:
-    db -- database instance
-    node_name -- id of the root node
-    distance -- maximum level upto which nodes should be considered
+def get_filtered_data(db, node_name):
+    """
+    Filters the Graph using node_name and returns the D1 list
     """
     nodes_id = {node_name}
     links = []
     nodes = []
-    node_distance_list = db[node_name]
-
-    # Adding nodes at distance 1
-    for i in node_distance_list['1']:
-        nodes_id.add(i['target'])
-    
-    # Adding nodes from distance [2, distance-1]
-    for i in range(2, distance):
-        nodes_id.update(node_distance_list[str(i)])
+    node_list = db[node_name]
 
     # Adding links
-    for i in nodes_id:
-        for k in db[i]['1']:
-            links.append({**k, "source": i })
+    for link in node_list['D1']:
+        links.append({**link, "source": node_name})
+        nodes_id.add(link['target'])
 
-
-    # Adding trail nodes at [distance] from node_name
-    nodes_id.update(node_distance_list[str(distance)])
 
     # Adding nodes metadata
     for node in nodes_id:
@@ -60,16 +45,9 @@ def serve_graph_data(request):
         if( not node_name in db ):
             return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 4})
 
-        # Retrieving distance params 
-        distance = request.GET.get('distance')
-        if(distance == None or int(distance) <=0):
-            distance=MAX_DISTANCE
-        else:
-            distance = min(int(distance), MAX_DISTANCE)
-
-        getData = get_filtered_data(db, node_name, distance)
+        data = get_filtered_data(db, node_name)
         db.close()
-        return JsonResponse(getData)
+        return JsonResponse(data, json_dumps_params={'indent': 4})
 
     return JsonResponse({"error": "true", "message": "Server Error"})
 
@@ -83,6 +61,6 @@ def serve_suggestions(request):
         if(len(query_set) > 8):
             random.shuffle(query_set)
             query_set = query_set[:8]
-        return JsonResponse({"error": False, "suggestions":query_set }, json_dumps_params={'indent': 4})
+        return JsonResponse({"error": False, "suggestions":query_set }, json_dumps_params={'indent': 2})
     else:
         return JsonResponse({"error": True, "message": "No query params passed" })
