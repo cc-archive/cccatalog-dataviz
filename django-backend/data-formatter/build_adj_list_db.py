@@ -3,7 +3,7 @@ import json
 import datetime
 
 DIST = 'D' # Prefix in every node distance key [eg. D1, D2]
-DBNAME = "graph_DB_new_mod"
+DBNAME = "graph_dB"
 INPUT_FILENAME = 'fdg_input_file.json'
 base_time = datetime.datetime.now()
 
@@ -68,10 +68,11 @@ def add_node_metadata(adjacency_map, aggregate_data):
         f'{datetime.datetime.now() - base_time}'
         f' Adding nodes metadata'
     )
+    dist_1_key = f'{DIST}1'
     nodes = aggregate_data['nodes']
     for node in nodes:
         adjacency_map.setdefault(
-            node['id'], {}
+            node['id'], {dist_1_key: []}
         )['metadata'] = node
 
     print(
