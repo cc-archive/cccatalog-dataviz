@@ -6,6 +6,7 @@ import random
 
 MAX_DISTANCE = 1
 OUTPUT_FILE_PATH = 'dataviz_api/data/graph_dB'
+LANDING_GRAPH_FILE_PATH = 'dataviz_api/data/landing_graph.json'
 
 def get_filtered_data(db, node_name):
     """
@@ -38,7 +39,7 @@ def serve_graph_data(request):
 
     # If node name is not provided sending whole file
     if(node_name == None):
-        data = open(OUTPUT_FILE_PATH+'.json', 'rb')
+        data = open(LANDING_GRAPH_FILE_PATH, 'rb')
         return FileResponse(data)
 
     with shelve.open(OUTPUT_FILE_PATH, writeback=False) as db:
