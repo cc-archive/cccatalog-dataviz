@@ -58,7 +58,7 @@ def serve_graph_data(request):
 def serve_suggestions(request):
     query = request.GET.get('q')
     if( query ):
-        query_set = list(Node.objects.filter(provider_domain__icontains=query).values())
+        query_set = list(Node.objects.filter(index__icontains=query).values())
         if(len(query_set) > 8):
             random.shuffle(query_set)
             query_set = query_set[:8]
