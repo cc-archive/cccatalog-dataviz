@@ -44,11 +44,11 @@ def serve_graph_data(request):
 
     with shelve.open(OUTPUT_FILE_PATH, writeback=False) as db:
         if( not node_name in db ):
-            return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 4})
+            return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 2})
 
         data = get_filtered_data(db, node_name)
         db.close()
-        return JsonResponse(data, json_dumps_params={'indent': 4})
+        return JsonResponse(data)
 
     return JsonResponse({"error": "true", "message": "Server Error"})
 
@@ -59,9 +59,7 @@ def serve_suggestions(request):
     query = request.GET.get('q')
     if( query ):
         query_set = list(Node.objects.filter(index__icontains=query).values())
-        if(len(query_set) > 8):
-            random.shuffle(query_set)
-            query_set = query_set[:8]
-        return JsonResponse({"error": False, "suggestions":query_set }, json_dumps_params={'indent': 2})
+        query_set = query_set[:8]
+        return JsonResponse({"error": False, "suggestions":query_set })
     else:
         return JsonResponse({"error": True, "message": "No query params passed" })
