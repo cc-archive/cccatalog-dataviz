@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  linkedcommons-dev:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+    ports:
+      - 3000:3000
+    environment:
+      - CI=true
+      - CHOKIDAR_USEPOLLING=true
+      - COMPOSE_CONVERT_WINDOWS_PATHS=1
