@@ -40,7 +40,7 @@ def get_filtered_data(db, node_name):
 def build_random_landing_graph(db):
     nodes = []
     links = []
-    count = Node.objects.all().count()
+    count = Node.objects.count()
     index = random.randint(a=1, b=count-7)
     root_node = Node.objects.all()[index].id
     nodes_id = set()
@@ -64,7 +64,7 @@ def build_random_landing_graph(db):
     for node in nodes_id:
         nodes.append(db[node]['metadata'])
 
-    return {'meta': {'link': len(links), 'node': len(nodes)}, 'links': links, 'nodes': nodes}
+    return {'links': links, 'nodes': nodes}
 
 
 def serve_graph_data(request):
@@ -72,11 +72,9 @@ def serve_graph_data(request):
     # Retrieving node name params
     node_name = request.GET.get('name')
 
-    with shelve.open(OUTPUT_FILE_PATH, writeback=False) as db:
+    with shelve.open(OUTPUT_FILE_PATH, writeback=False, flag='r') as db:
     # If node name is not provided sending whole file
         if(node_name == None):
-            # data = open(LANDING_GRAPH_FILE_PATH, 'rb')
-            # return FileResponse(data)
             data = build_random_landing_graph(db)
             return JsonResponse(data)
         else:
