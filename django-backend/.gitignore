@@ -1,4 +1,4 @@
-data-formatter/*.json
+*/*.json
 *.bak
 *.dat
 *.dir
