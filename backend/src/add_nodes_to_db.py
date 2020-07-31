@@ -26,9 +26,12 @@ with shelve.open(DB_PATH) as db:
             # break
             Node.objects.bulk_create(nodes_list)
             nodes_list.clear()
-            print(
-                f"Added ${count}, Time Elapsed: ${datetime.datetime.now() - base_time}"
-            )
+            print(f"Added ${count}, Time Elapsed: ${datetime.datetime.now() - base_time}")
 
+    # Adding Remaining Nodes
+    Node.objects.bulk_create(nodes_list)
+    nodes_list.clear()
+    print(f"Added ${count}, Time Elapsed: ${datetime.datetime.now() - base_time}")
+            
 
 print("Number of Nodes Added: ", count)
