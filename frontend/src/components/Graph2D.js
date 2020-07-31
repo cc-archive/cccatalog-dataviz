@@ -49,6 +49,10 @@ class Graph2D extends React.Component {
         isDarkMode: true,
         // Show processing 
         processing: false,
+        // color links
+        colorLinks: false,
+        // root node name
+        rootNode: "pediaa"
     }
 
     constructor(props) {
@@ -72,7 +76,7 @@ class Graph2D extends React.Component {
             isDarkMode: theme === 'dark' ? true : false,
         });
         // Fetching the data from source endpoint
-        fetch(`${SERVER_BASE_ENDPOINT}/graph-data`)
+        fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=pediaa`)
             .then((res) => res.json())
             .then(res => {
                 this.simulateForceGraph(res);
@@ -101,11 +105,45 @@ class Graph2D extends React.Component {
                                     graphData={this.state.graphData}
                                     onLinkHover={this.handleLinkHover}
                                     linkWidth={link => (this.state.hoverLink === link || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? 2 : 1}
-                                    linkColor={(link) => (link === this.state.hoverLink || this.state.highlightNodes.has(link.source.id) || this.state.highlightNodes.has(link.target.id)) ? (this.state.isDarkMode ? darkThemeData.hoverLinkColor : lightThemeData.hoverLinkColor) : (this.state.isDarkMode ? darkThemeData.linkColor : lightThemeData.linkColor)}
+                                    linkColor={(link) => {
+                                        if (
+                                            link === this.state.hoverLink ||
+                                            this.state.highlightNodes.has(link.source.id) ||
+                                            this.state.highlightNodes.has(link.target.id)) {
+                                            return (this.state.isDarkMode ? darkThemeData.hoverLinkColor : lightThemeData.hoverLinkColor)
+                                        } else {
+                                            // node not highlighted
+                                            if (this.state.colorLinks) {
+                                                if (this.state.isDarkMode) {
+                                                    console.log(this.state.rootNode)
+                                                    if (link.source.id === 'pediaa') {
+                                                        return 'rgba(250, 190, 88, 1)';
+                                                    } else {
+                                                        return 'orange';
+                                                    }
+                                                } else {
+                                                    if (link.source.id === this.state.rootNode) {
+                                                        return 'orange';
+                                                    } else {
+                                                        return '#ffee33';
+                                                    }
+                                                    // return (this.state.isDarkMode ? (link.source.id == this.state.rootNode) : lightThemeData.linkColor);
+
+                                                }
+                                            } else {
+                                                return (this.state.isDarkMode ? darkThemeData.linkColor : lightThemeData.linkColor);
+                                            }
+                                        }
+                                    }
+                                    }
                                     nodeCanvasObjectMode={() => 'replace'}
                                     linkCanvasObjectMode={() => 'after'}
                                     backgroundColor={this.state.isDarkMode ? darkThemeData.graphCanvasColor : lightThemeData.graphCanvasColor}
                                     linkCanvasObject={this.handleLinkCanvasObject}
+                                    onNodeDragEnd = {node => {
+                                        node.fx = node.x;
+                                        node.fy = node.y;
+                                    }}
                                     onNodeClick={this.handleOnNodeClick}
                                     nodeLabel={(node) => `${node.id}`}
                                     nodeCanvasObject={this.handleNodeCanvasObject}
@@ -182,6 +220,7 @@ class Graph2D extends React.Component {
             processing: true,
         })
         try {
+            let rootNode = nodeName;
             let res = await fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=${nodeName}`);
             let jsonData = await res.json();
 
@@ -195,13 +234,18 @@ class Graph2D extends React.Component {
                 setTimeout(() => {
                     this.graphRef.current.zoomToFit(1000, 10)
                 }, 500)
+
                 this.setState({
-                    processing: false
+                    "colorLinks": true,
+                    "rootNode": rootNode,
                 })
             }
         } catch (err) {
             console.log(err);
         }
+        this.setState({
+            processing: false
+        })
     }
     // Handles Filtering by node name
     handleFilterSubmit = (payload) => {
