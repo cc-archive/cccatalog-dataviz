@@ -3,6 +3,7 @@ import json
 import datetime
 
 DIST = 'D' # Prefix in every node distance key [eg. D1, D2]
+REV_DIST = 'RD' 
 DBNAME = "graph_dB"
 INPUT_FILENAME = 'fdg_input_file.json'
 base_time = datetime.datetime.now()
@@ -49,13 +50,17 @@ def init_adjacency_map(aggregate_data):
     )
     links = aggregate_data['links']
     adjacency_map = {}
-    dist_1_key = f'{DIST}1'
+    dist_1_out_key = f'{DIST}1'
+    dist_1_in_key = f'{REV_DIST}1'
 
     for link in links:
         adjacency_map.setdefault(
-            link['source'], {dist_1_key: []}
-        )[dist_1_key].append({"target": link['target'], "value": link['value']})
-        adjacency_map.setdefault(link['target'], {dist_1_key: []})
+            link['source'], {dist_1_out_key: [], dist_1_in_key:[]}
+        )[dist_1_out_key].append({"target": link['target'], "value": link['value']})
+
+        adjacency_map.setdefault(
+            link['target'], {dist_1_out_key: [], dist_1_in_key:[]}
+        )[dist_1_in_key].append({"source": link['source'], "value": link['value']})
     print(
         f'{datetime.datetime.now() - base_time}'
         f' Adjacency map created. Length: {len(adjacency_map)}'
@@ -68,11 +73,13 @@ def add_node_metadata(adjacency_map, aggregate_data):
         f'{datetime.datetime.now() - base_time}'
         f' Adding nodes metadata'
     )
-    dist_1_key = f'{DIST}1'
+    dist_1_out_key = f'{DIST}1'
+    dist_1_in_key = f'{REV_DIST}1'
+    
     nodes = aggregate_data['nodes']
     for node in nodes:
         adjacency_map.setdefault(
-            node['id'], {dist_1_key: []}
+            node['id'], {dist_1_out_key: [], dist_1_in_key:[]}
         )['metadata'] = node
 
     print(
