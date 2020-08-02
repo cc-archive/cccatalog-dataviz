@@ -49,10 +49,8 @@ class Graph2D extends React.Component {
         isDarkMode: true,
         // Show processing 
         processing: false,
-        // color links
-        colorLinks: false,
         // root node name
-        rootNode: "pediaa"
+        rootNode: ""
     }
 
     constructor(props) {
@@ -76,9 +74,12 @@ class Graph2D extends React.Component {
             isDarkMode: theme === 'dark' ? true : false,
         });
         // Fetching the data from source endpoint
-        fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=pediaa`)
+        fetch(`${SERVER_BASE_ENDPOINT}/graph-data`)
             .then((res) => res.json())
             .then(res => {
+                this.setState({
+                    "rootNode": res['root_node']
+                })
                 this.simulateForceGraph(res);
             });
     }
@@ -113,25 +114,18 @@ class Graph2D extends React.Component {
                                             return (this.state.isDarkMode ? darkThemeData.hoverLinkColor : lightThemeData.hoverLinkColor)
                                         } else {
                                             // node not highlighted
-                                            if (this.state.colorLinks) {
-                                                if (this.state.isDarkMode) {
-                                                    console.log(this.state.rootNode)
-                                                    if (link.source.id === 'pediaa') {
-                                                        return 'rgba(250, 190, 88, 1)';
-                                                    } else {
-                                                        return 'orange';
-                                                    }
+                                            if (this.state.isDarkMode) {
+                                                if (link.source.id === this.state.rootNode) {
+                                                    return '#D1DCF1';
                                                 } else {
-                                                    if (link.source.id === this.state.rootNode) {
-                                                        return 'orange';
-                                                    } else {
-                                                        return '#ffee33';
-                                                    }
-                                                    // return (this.state.isDarkMode ? (link.source.id == this.state.rootNode) : lightThemeData.linkColor);
-
+                                                    return '#eb5721';
                                                 }
                                             } else {
-                                                return (this.state.isDarkMode ? darkThemeData.linkColor : lightThemeData.linkColor);
+                                                if (link.source.id === this.state.rootNode) {
+                                                    return '#F5D400';
+                                                } else {
+                                                    return '#04A635';
+                                                }
                                             }
                                         }
                                     }
@@ -140,7 +134,7 @@ class Graph2D extends React.Component {
                                     linkCanvasObjectMode={() => 'after'}
                                     backgroundColor={this.state.isDarkMode ? darkThemeData.graphCanvasColor : lightThemeData.graphCanvasColor}
                                     linkCanvasObject={this.handleLinkCanvasObject}
-                                    onNodeDragEnd = {node => {
+                                    onNodeDragEnd={node => {
                                         node.fx = node.x;
                                         node.fy = node.y;
                                     }}
@@ -236,7 +230,6 @@ class Graph2D extends React.Component {
                 }, 500)
 
                 this.setState({
-                    "colorLinks": true,
                     "rootNode": rootNode,
                 })
             }
@@ -384,7 +377,7 @@ class Graph2D extends React.Component {
 
     // configuring render style for links or edges of the graph
     handleLinkCanvasObject = (link, ctx) => {
-        if (this.state.currentZoomLevel < 2) {
+        if (this.state.currentZoomLevel < 2 || this.state.graphData['nodes'].length > 100) {
             return;
         }
         const MAX_FONT_SIZE = 6;
