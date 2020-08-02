@@ -54,7 +54,7 @@ class Graph2D extends React.Component {
     }
 
     constructor(props) {
-        super(props);
+        super();
         this.graphRef = React.createRef();
         this.state.highlightNodes = new Map();
     }
@@ -117,14 +117,18 @@ class Graph2D extends React.Component {
                                             if (this.state.isDarkMode) {
                                                 if (link.source.id === this.state.rootNode) {
                                                     return '#D1DCF1';
-                                                } else {
+                                                } else if (link.target.id === this.state.rootNode) {
                                                     return '#eb5721';
+                                                } else {
+                                                    return darkThemeData.linkColor;
                                                 }
                                             } else {
                                                 if (link.source.id === this.state.rootNode) {
                                                     return '#F5D400';
-                                                } else {
+                                                } else if (link.target.id === this.state.rootNode) {
                                                     return '#04A635';
+                                                } else {
+                                                    return lightThemeData.linkColor;
                                                 }
                                             }
                                         }
@@ -187,7 +191,9 @@ class Graph2D extends React.Component {
         })
         this.graphRef.current.d3Force('charge', null)
         this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
-        this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
+
+        if (this.state.graphData['nodes'].length < 300)
+            this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
     }
 
     searchNodesInDepth(adjacencyList, node, visited, maxLevel, currLevel, links) {
