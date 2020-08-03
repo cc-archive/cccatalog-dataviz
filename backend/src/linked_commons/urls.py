@@ -1,8 +1,8 @@
-from django.contrib import admin
-from django.urls import path, include
-from dataviz_api import urls as dataviz_api_urls
+from django.urls import path
+from linked_commons import views
+
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/", include(dataviz_api_urls)),
+    path('graph-data/', views.serve_graph_data),
+    path('suggestions/', views.serve_suggestions)
 ]
