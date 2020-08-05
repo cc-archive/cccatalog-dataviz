@@ -1,0 +1,19 @@
+version: '3'
+
+
+services:
+  mongodb:
+    image: mongo:4.0.8
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --auth
+    env_file:
+        - ./prod.env
+    volumes:
+      - mongodbdata:/data/db
+    ports:
+    - "27017:27017"
+
+volumes:
+    mongodbdata:
+        driver: local
