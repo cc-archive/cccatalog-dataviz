@@ -32,13 +32,13 @@ def add_nodes_metadata(node_list):
     
     return nodes
 
-def get_filtered_data(node_name, node_collection_instance):
+def get_filtered_data(node_name, collection_instance):
     """
     Filters the Graph using node_name and returns the D1 list
     """
     nodes_id = {node_name}
     links = []
-    node_list = node_collection_instance.find_one(node_name)
+    node_list = collection_instance.find_one(node_name)
 
     # Adding outgoing D1 links
     for link in node_list['D1']:
@@ -50,7 +50,7 @@ def get_filtered_data(node_name, node_collection_instance):
         links.append({**link, "target": node_name})
         nodes_id.add(link['source'])
 
-    node_list = node_collection_instance.find({"_id": {"$in": list(nodes_id)}}, projection=['metadata'])
+    node_list = collection_instance.find({"_id": {"$in": list(nodes_id)}}, projection=['metadata'])
 
     nodes = add_nodes_metadata(node_list)
 
@@ -59,7 +59,8 @@ def get_filtered_data(node_name, node_collection_instance):
 
 def build_random_landing_graph(db):
     links = []
-    index = random.randint(a=1, b=230000)
+    total_nodes = db.count()
+    index = random.randint(a=1, b=total_nodes-1)
     root_node = db.find(projection=[]).limit(-1).skip(index).next()['_id']
     nodes_id = set()
     nodes_id.add(root_node)
@@ -101,18 +102,18 @@ def serve_graph_data(request):
     
     client = pymongo.MongoClient(f"mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}")
     db = client.get_database(name=DB_NAME)
-    node_collection_instance = db.get_collection(name=COLLECTION_NAME)
+    collection_instance = db.get_collection(name=COLLECTION_NAME)
     # If node name is not provided sending whole file
     if(node_name == None):
-        data = build_random_landing_graph(node_collection_instance)
+        data = build_random_landing_graph(collection_instance)
         client.close()
         return JsonResponse(data)
     else:
-        node_count=node_collection_instance.count_documents({'_id':node_name})
+        node_count=collection_instance.count_documents({'_id':node_name})
         if( node_count==0 ):
             return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 2})
 
-        data = get_filtered_data(node_name, node_collection_instance)
+        data = get_filtered_data(node_name, collection_instance)
         client.close()
         return JsonResponse(data)
 
@@ -125,8 +126,14 @@ def serve_graph_data(request):
 def serve_suggestions(request):
     query = request.GET.get('q')
     if( query ):
-        query_set = list(Node.objects.filter(index__icontains=query).values())
-        query_set = query_set[:8]
+        client = pymongo.MongoClient(f"mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}")
+        db = client.get_database(name=DB_NAME)
+        collection_instance = db.get_collection(name=COLLECTION_NAME)
+        res = collection_instance.find({'_id':{'$regex':query}}, return_key=True).limit(8)
+        query_set = []
+        for node in res:
+            query_set.append({'id': node['_id']})
+        
         return JsonResponse({"error": False, "suggestions":query_set })
     else:
         return JsonResponse({"error": True, "message": "No query params passed" })
