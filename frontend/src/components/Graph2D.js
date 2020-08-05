@@ -6,7 +6,7 @@ import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar'
 
 // source data
-const SERVER_BASE_ENDPOINT = process.env.REACT_APP_SERVER_BASE_ENDPOINT;
+const SERVER_BASE_ENDPOINT = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_BASE_ENDPOINT_PROD : process.env.REACT_APP_SERVER_BASE_ENDPOINT_DEV;
 
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',
