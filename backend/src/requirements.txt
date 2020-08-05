@@ -1,2 +1,5 @@
 Django==2.2.13
 django-cors-headers
+pymongo
+dnspython
+gunicorn

@@ -85,6 +85,15 @@ DATABASES = {
     }
 }
 
+MONGO_DB_CRED = {
+    'USERNAME': os.environ.get('MONGO_INITDB_ROOT_USERNAME'),
+    'PASSWORD': os.environ.get('MONGO_INITDB_ROOT_PASSWORD'),
+    'DB_NAME': os.environ.get('MONGO_DB_NAME'),
+    'COLLECTION_NAME': os.environ.get('MONGO_COLLECTION_NAME'),
+    'HOSTNAME': os.environ.get('MONGO_HOSTNAME'),
+}
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

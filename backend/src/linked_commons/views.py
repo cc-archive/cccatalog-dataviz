@@ -3,25 +3,42 @@ from django.http import JsonResponse, FileResponse
 import shelve
 from linked_commons.models import Node
 import random, string
+import json
+import pymongo
+from config.settings import MONGO_DB_CRED
 
-# shelve dB path
-OUTPUT_FILE_PATH = 'linked_commons/data/graph_dB'
-# Landing graph path
-LANDING_GRAPH_FILE_PATH = 'linked_commons/data/landing_graph.json'
 
 LANDING_GRAPH_META = {
     "links": 500,
     "nodes": 500,
 }
 
-def get_filtered_data(db, node_name):
+
+USERNAME = MONGO_DB_CRED['USERNAME']
+PASSWORD = MONGO_DB_CRED['PASSWORD']
+DB_NAME = MONGO_DB_CRED['DB_NAME']
+COLLECTION_NAME = MONGO_DB_CRED['COLLECTION_NAME']
+HOSTNAME = MONGO_DB_CRED['HOSTNAME']
+
+def add_nodes_metadata(node_list):
+    nodes = []
+    # Adding nodes metadata
+    for node in node_list:
+        curr_node=node['metadata']
+        if(curr_node['cc_licenses']):
+            curr_node['cc_licenses']=json.loads(curr_node['cc_licenses'])
+
+        nodes.append(curr_node)
+    
+    return nodes
+
+def get_filtered_data(node_name, node_collection_instance):
     """
     Filters the Graph using node_name and returns the D1 list
     """
     nodes_id = {node_name}
     links = []
-    nodes = []
-    node_list = db[node_name]
+    node_list = node_collection_instance.find_one(node_name)
 
     # Adding outgoing D1 links
     for link in node_list['D1']:
@@ -33,40 +50,46 @@ def get_filtered_data(db, node_name):
         links.append({**link, "target": node_name})
         nodes_id.add(link['source'])
 
-    # Adding nodes metadata
-    for node in nodes_id:
-        nodes.append(db[node]['metadata'])
+    node_list = node_collection_instance.find({"_id": {"$in": list(nodes_id)}}, projection=['metadata'])
 
+    nodes = add_nodes_metadata(node_list)
 
     return {'links': links, 'nodes': nodes}
 
 
 def build_random_landing_graph(db):
-    nodes = []
     links = []
-    count = Node.objects.count()
-    index = random.randint(a=1, b=count-7)
-    root_node = Node.objects.all()[index].id
+    index = random.randint(a=1, b=230000)
+    root_node = db.find(projection=[]).limit(-1).skip(index).next()['_id']
     nodes_id = set()
     nodes_id.add(root_node)
 
-    while len(nodes_id)<500 and len(links)<500:
+    while len(nodes_id)<LANDING_GRAPH_META['nodes'] and len(links)<LANDING_GRAPH_META['links']:
         temp_nodes_id = []
+        node_list=db.find_one(root_node)
         # Adding links
-        for link in db[root_node]['D1']:
+        for link in node_list['D1']:
             links.append({**link, "source": root_node})
             temp_nodes_id.append(link['target'])
+            if(len(nodes_id)+len(temp_nodes_id)>500):
+                break
+
+        # Adding incoming D1 links
+        for link in node_list['RD1']:
+            links.append({**link, "target": root_node})
+            temp_nodes_id.append(link['source'])
+            if(len(nodes_id)+len(temp_nodes_id)>500):
+                break
 
         nodes_id.update(temp_nodes_id)
-        if temp_nodes_id:
+        if temp_nodes_id and len(nodes_id)<500:
             # selecting a random node as root_node
             root_node = random.choice(temp_nodes_id)
         else:
             break
     
-    # Adding Meta Data
-    for node in nodes_id:
-        nodes.append(db[node]['metadata'])
+    node_list = db.find({"_id": {"$in": list(nodes_id)}}, projection=['metadata'])
+    nodes = add_nodes_metadata(node_list)
 
     return {'links': links, 'nodes': nodes}
 
@@ -75,20 +98,25 @@ def serve_graph_data(request):
     """Serves Graph Data"""
     # Retrieving node name params
     node_name = request.GET.get('name')
-
-    with shelve.open(OUTPUT_FILE_PATH, writeback=False, flag='r') as db:
+    
+    client = pymongo.MongoClient(f"mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}")
+    db = client.get_database(name=DB_NAME)
+    node_collection_instance = db.get_collection(name=COLLECTION_NAME)
     # If node name is not provided sending whole file
-        if(node_name == None):
-            data = build_random_landing_graph(db)
-            return JsonResponse(data)
-        else:
-            if( not node_name in db ):
-                return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 2})
+    if(node_name == None):
+        data = build_random_landing_graph(node_collection_instance)
+        client.close()
+        return JsonResponse(data)
+    else:
+        node_count=node_collection_instance.count_documents({'_id':node_name})
+        if( node_count==0 ):
+            return JsonResponse({"error": True, "message": "node " + node_name + " doesn't exist"}, json_dumps_params={'indent': 2})
 
-            data = get_filtered_data(db, node_name)
-            db.close()
-            return JsonResponse(data)
+        data = get_filtered_data(node_name, node_collection_instance)
+        client.close()
+        return JsonResponse(data)
 
+    client.close()
     return JsonResponse({"error": "true", "message": "Server Error"})
 
 

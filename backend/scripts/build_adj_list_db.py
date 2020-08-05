@@ -14,6 +14,7 @@ PASSWORD=os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
 MONGO_DB_NAME=os.environ.get('MONGO_DB_NAME')
 MONGO_COLLECTION_NAME=os.environ.get('MONGO_COLLECTION_NAME')
 
+HOSTNAME="localhost:27017"
 
 def main(
     adjacency_shelf_name=DBNAME,
@@ -36,7 +37,7 @@ def init_adjacency_shelf(adjacency_shelf_name, aggregate_data):
         f'{datetime.datetime.now() - base_time}'
         f' Saving Adjacency map to shelf DB: {adjacency_shelf_name}'
     )
-    client = pymongo.MongoClient(f'mongodb://{USERNAME}:{PASSWORD}@localhost:27017')
+    client = pymongo.MongoClient(f'mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}')
     db = client.get_database(name=MONGO_DB_NAME)
     node_collection = db.get_collection(name=MONGO_COLLECTION_NAME)
     count=0
