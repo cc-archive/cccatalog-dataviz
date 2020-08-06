@@ -6,18 +6,16 @@ services:
     build:
       context: backend/
       dockerfile: Dockerfile
-    command: sh -c "cd src/ && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    command: sh -c "python src/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - './backend/:/backend/'
+    ports:
+      - 8000:8000
     env_file:
       - ./.env
     depends_on:
       - mongodb
-  nginx:
-    build: ./backend/nginx
-    # Mapping Container PORT 80 to Host PORT 5000
-    ports:
-      - 8000:80 
-    depends_on:
-      - backend
+      
   mongodb:
     image: mongo:4.0.8
     container_name: mongodb
@@ -29,13 +27,22 @@ services:
       - mongodbdata:/data/db
     ports:
     - "27017:27017"
+
   frontend:
-    container_name: frontend
+    stdin_open: true
     build:
       context: frontend/
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend/:/frontend/'
     ports:
-      - '3000:80'
+      - 3000:3000
+    environment:
+      - CI=true
+      - CHOKIDAR_USEPOLLING=true
+      - COMPOSE_CONVERT_WINDOWS_PATHS=1
+
+
 volumes:
     mongodbdata:
         driver: local

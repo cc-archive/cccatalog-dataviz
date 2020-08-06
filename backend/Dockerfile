@@ -6,7 +6,7 @@ WORKDIR /backend
 
 # install dependencies
 RUN pip install --upgrade pip
-COPY ./src/requirements.txt .
+COPY ./requirements.txt .
 RUN pip install -r ./requirements.txt
 
 # copy project

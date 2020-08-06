@@ -24,6 +24,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", 1))
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -52,9 +53,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ORIGIN_WHITELIST = os.environ.get(
-    "CORS_ORIGIN_WHITELIST", "http://localhost:3000"
-).split(" ")
+if DEBUG:
+    CORS_ORIGIN_ALLOW_ALL=True
+else:
+    CORS_ORIGIN_WHITELIST = os.environ.get(
+        "CORS_ORIGIN_WHITELIST", "http://localhost:3000"
+    ).split(" ")
 
 ROOT_URLCONF = "config.urls"
 
