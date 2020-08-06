@@ -7,15 +7,19 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Node',
+            name="Node",
             fields=[
-                ('id', models.CharField(max_length=1000)),
-                ('index', models.CharField(max_length=1000, primary_key=True, serialize=False)),
+                ("id", models.CharField(max_length=1000)),
+                (
+                    "index",
+                    models.CharField(
+                        max_length=1000, primary_key=True, serialize=False
+                    ),
+                ),
             ],
         ),
     ]
