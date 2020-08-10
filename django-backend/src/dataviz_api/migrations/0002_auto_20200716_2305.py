@@ -6,13 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dataviz_api', '0001_initial'),
+        ("dataviz_api", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='node',
-            old_name='provider_domain',
-            new_name='index',
+            model_name="node", old_name="provider_domain", new_name="index",
         ),
     ]
