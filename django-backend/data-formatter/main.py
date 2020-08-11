@@ -1,120 +1,93 @@
 import shelve
-import copy
 import json
+import datetime
 
-# INPUT DATA SOURCE FILENAME
-INPUT_FILE_NAME = 'fdg_input_file.json'
-OUTPUT_FILE_NAME = 'fdg_output_file'
-# Maximum distance to be considered
-MAX_DISTANCE = 10
+MAX_DISTANCE = 2
+DIST = "D"  # Prefix in every node distance key [eg. D1, D2]
+DBNAME = "graph_DB_new_mod"
+INPUT_FILENAME = "fdg_input_file.json"
+base_time = datetime.datetime.now()
 
 
+def main(
+    max_distance=MAX_DISTANCE,
+    adjacency_shelf_name=DBNAME,
+    input_filename=INPUT_FILENAME,
+):
+    with open(input_filename) as f:
+        data = json.loads(f.read())
 
-def build_schema(distance):
+    init_adjacency_shelf(adjacency_shelf_name, data)
+    # Adding nodes at distance [2, MAX_DISTANCE]
+    for d in range(2, MAX_DISTANCE + 1):
+        add_dx_list_to_adjacency_shelf(adjacency_shelf_name, d=d)
+
+
+def init_adjacency_shelf(adjacency_shelf_name, aggregate_data):
     """
-    Builds schema for an individual node
+    Stores adjacency Map or distance 1 list into shelve dB
     """
-    schema = {}
-    for i in range(distance):
-        schema[str(i+1)] = []
-    return schema
+    adjacency_map = init_adjacency_map(aggregate_data)
+    print(
+        f"{datetime.datetime.now() - base_time}"
+        f" Saving Adjacency map to shelf DB: {adjacency_shelf_name}"
+    )
+    with shelve.open(adjacency_shelf_name) as db:
+        for k in adjacency_map:
+            db[k] = adjacency_map[k]
+    print(f"{datetime.datetime.now() - base_time}" f" Adjacency Map saved")
 
-def create_adjacency_list(aggregate_data):
+
+def init_adjacency_map(aggregate_data):
     """
-    Converts the {'nodes': [], 'links': []} into Adjancency List
+    Converts the {'nodes': [], 'links': []} into Adjancency Map
     """
-    links = aggregate_data['links']
-    adjacency_list = {}
+    print(f"{datetime.datetime.now() - base_time}" f" Creating adjacency map")
+    links = aggregate_data["links"]
+    adjacency_map = {}
+    dist_1_key = f"{DIST}1"
 
     for link in links:
-        key = link['source']
-        if not key in adjacency_list:
-            adjacency_list[key] = []
-        if not link['target'] in adjacency_list:
-            adjacency_list[link['target']] = []
-
-        adjacency_list[key].append({
-            "target": link['target'],
-            "value": link['value']
-        })
-    return adjacency_list
+        adjacency_map.setdefault(link["source"], {dist_1_key: set()})[dist_1_key].add(
+            link["target"]
+        )
+        adjacency_map.setdefault(link["target"], {dist_1_key: set()})
+    print(
+        f"{datetime.datetime.now() - base_time}"
+        f" Adjacency map created. Length: {len(adjacency_map)}"
+    )
+    return adjacency_map
 
 
-def bfs(adj_list, node):
+def add_dx_list_to_adjacency_shelf(adjacency_shelf_name, d=2, dist_stub=DIST):
     """
-    Breadth First Search Traversal 
+    Finds set of nodes at distance [d] for every node in adjacency list
     """
-    visited = []
-    visited.append(node)
-    distance_list = copy.deepcopy(schema)
-    q = []
-    q.append({"node": node, "level": 0})
-    while q:
-        front = q.pop(0)
-        currNode = front['node']
-        currLevel = front['level']
-        if(int(currLevel) >= MAX_DISTANCE):
-            continue
-        for i in adj_list[currNode]:
-            if not i in visited:
-                q.append({'node': i['target'], 'level': currLevel+1})
-                distance_list[str(currLevel+1)].append(i)
-                visited.append(i)
+    d_minus_1_key = f"{dist_stub}{d - 1}"
+    d1_key = f"{dist_stub}1"
+    count = 0
+    print(
+        f"{datetime.datetime.now() - base_time}"
+        f" Adding {dist_stub}{d} set to {adjacency_shelf_name}"
+    )
+    with shelve.open(adjacency_shelf_name) as db:
+        for key in db:
+            node_adj_info = db[key]
+            dx_set = {
+                target
+                for node in node_adj_info[d1_key]
+                for target in db[node][d_minus_1_key]
+            }
+            for i in range(1, d):
+                dx_set.difference_update(node_adj_info[f"{dist_stub}{i}"])
+            node_adj_info[f"{dist_stub}{d}"] = dx_set
+            db[key] = node_adj_info
+            count += 1
 
-    return distance_list
-
-def dump_json(output_list):
-    """
-    Creates a python dictionary and dumps a JSON object
-    """
-    json_output_list = {}
-    for key in output_list:
-        json_output_list[key] = output_list[key]
-
-    open(OUTPUT_FILE_NAME+'.json', 'w').write(json.dumps(json_output_list, indent=2))
+            # Dumping the Batch into the shelve dB
+            if count % 1000 == 0:
+                print(f"{datetime.datetime.now() - base_time} Saved {count}")
 
 
-
-# Building schema
-schema = build_schema(MAX_DISTANCE)
-
-# Loading Input File
-input_file = open(INPUT_FILE_NAME).read()
-aggregate_data = json.loads(input_file)
-# Building Adjacency List
-adjacency_list = create_adjacency_list(aggregate_data)
-
-# Opening shelve instance
-output_list = shelve.open(OUTPUT_FILE_NAME, writeback=True)
-
-# Calling BFS on every node and adding the nodes inside output_list
-for node in adjacency_list:
-    # calling bfs from node
-    distance_list_of_node = bfs(adjacency_list, node)
-    # adding to output_list
-    output_list[node] = distance_list_of_node
-
-
-# DEBUG: List to store the nodes which are are completely isolated (Both indegree and outdegree zero)
-redundant_nodes = []
-
-nodes = aggregate_data['nodes']
-# Adding metadata to all nodes
-for node in nodes:
-    try:
-        # output_list[node['id']]['metadata'] = {key: value for key, value in node.items() if key not in 'id'}
-        output_list[node['id']]['metadata'] = node
-    except Exception as e:
-        # Appending all redundant nodes
-        redundant_nodes.append(e.args[0])
-
-# DEBUG: 
-# print('REDUNDANT_NODES: ', redundant_nodes, len(redundant_nodes))
-
-output_list.sync()
-
-# Uncomment this to output JSON file [Only to visualize the data]
-# dump_json(output_list)
-
-
-output_list.close()
+if __name__ == "__main__":
+    main()

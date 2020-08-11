@@ -2,17 +2,33 @@
 
 import json
 from dataviz_api.models import Node
+import shelve
+import datetime
 
-FILE_PATH = "./dataviz_api/data/fdg_output_file.json"
+DB_PATH = "./dataviz_api/data/graph_dB"
+base_time = datetime.datetime.now()
+BATCH_SIZE = 10000
 
-data = open(FILE_PATH).read()
-json_data = json.loads(data)
-nodes = json_data['nodes']
+with shelve.open(DB_PATH) as db:
+    count = 0
+    nodes_list = []
+    for node_id in db:
+        node = db[node_id]["metadata"]
+        if node["provider_domain"] == "Domain not available":
+            index = node["id"]
+        else:
+            index = node["provider_domain"]
 
-count=0
-for i in nodes:
-    instance = Node(id = i['id'], provider_domain=i['provider_domain'])
-    instance.save()
-    count+=1
+        instance = {"id": node["id"], "index": index}
+        nodes_list.append(Node(**instance))
+        count += 1
+        if count % BATCH_SIZE == 0:
+            # break
+            Node.objects.bulk_create(nodes_list)
+            nodes_list.clear()
+            print(
+                f"Added ${count}, Time Elapsed: ${datetime.datetime.now() - base_time}"
+            )
+
 
 print("Number of Nodes Added: ", count)
