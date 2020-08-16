@@ -35,8 +35,4 @@ with shelve.open(DB_PATH) as db:
     nodes_list.clear()
     print(f"Added ${count}, Time Elapsed: ${datetime.datetime.now() - base_time}")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Add python black configuration
 print("Number of Nodes Added: ", count)
