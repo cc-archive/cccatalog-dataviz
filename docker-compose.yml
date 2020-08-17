@@ -29,18 +29,18 @@ services:
     - "27017:27017"
 
   frontend:
-    stdin_open: true
+    tty: true
     build:
       context: frontend/
       dockerfile: Dockerfile
     volumes:
       - './frontend/:/frontend/'
+      - '/frontend/node_modules'
     ports:
       - 3000:3000
     environment:
       - CI=true
       - CHOKIDAR_USEPOLLING=true
-      - COMPOSE_CONVERT_WINDOWS_PATHS=1
 
 
 volumes:

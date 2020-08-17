@@ -10,8 +10,9 @@ ENV PATH /frontend/node_modules/.bin:$PATH
 # install frontend dependencies
 RUN apk add --no-cache git
 COPY package.json ./
-COPY package-lock.json ./
+# COPY package-lock.json ./
 RUN npm install
+RUN npm install -g react-scripts@3.4.0
 
 # add frontend
 COPY . ./
