@@ -1,0 +1,20 @@
+# pull official base image
+FROM python:3.7.8-alpine
+
+
+# install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip install -r ./requirements.txt
+
+# copy project
+COPY ./src ./src
+COPY ./nginx ./nginx
+COPY ./.env ./
+
+# set work directory
+WORKDIR /src
+
+EXPOSE 8000
+
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
