@@ -3,3 +3,4 @@ django-cors-headers
 pymongo
 dnspython
 gunicorn
+python-dotenv

@@ -2,10 +2,13 @@ import json
 import datetime
 import pymongo
 import os
+from dotenv import load_dotenv
+
+# Loading env variables file
+load_dotenv('../.env')
 
 DIST = "D"  # Prefix in every node distance key [eg. D1, D2]
 REV_DIST = "RD"
-DBNAME = "graph_dB"
 INPUT_FILENAME = "fdg_input_file.json"
 base_time = datetime.datetime.now()
 
@@ -14,17 +17,18 @@ PASSWORD = os.environ.get("MONGO_INITDB_ROOT_PASSWORD")
 MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME")
 MONGO_COLLECTION_NAME = os.environ.get("MONGO_COLLECTION_NAME")
 
+# Change this to container_name:port inside docker container
 HOSTNAME = "localhost:27017"
 
 
-def main(adjacency_shelf_name=DBNAME, input_filename=INPUT_FILENAME):
+def main(input_filename=INPUT_FILENAME):
     with open(input_filename) as f:
         data = json.loads(f.read())
 
-    init_adjacency_shelf(adjacency_shelf_name, data)
+    init_adjacency_shelf(data)
 
 
-def init_adjacency_shelf(adjacency_shelf_name, aggregate_data):
+def init_adjacency_shelf(aggregate_data):
     """
     Stores adjacency Map or distance 1 list with nodes metadata into shelve dB
     """
@@ -32,7 +36,7 @@ def init_adjacency_shelf(adjacency_shelf_name, aggregate_data):
     add_node_metadata(adjacency_map, aggregate_data)
     print(
         f"{datetime.datetime.now() - base_time}"
-        f" Saving Adjacency map to shelf DB: {adjacency_shelf_name}"
+        f" Saving Adjacency map to MongoDB: {MONGO_DB_NAME}"
     )
     client = pymongo.MongoClient(f"mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}")
     db = client.get_database(name=MONGO_DB_NAME)

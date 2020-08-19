@@ -11,8 +11,6 @@ services:
       - './backend/:/backend/'
     ports:
       - 8000:8000
-    env_file:
-      - ./.env
     depends_on:
       - mongodb
       
@@ -22,7 +20,7 @@ services:
     restart: unless-stopped
     command: mongod --auth
     env_file:
-        - ./.env
+        - ./backend/.env
     volumes:
       - mongodbdata:/data/db
     ports:
