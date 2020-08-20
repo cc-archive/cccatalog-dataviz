@@ -343,7 +343,7 @@ html[data-theme="dark"] .explore-cc-btn {
     z-index: 1;
     width: 100%;
     overflow-x: hidden;
-    height: calc(calc(var(--vh, 1vh) * 100)-var(--searchbar-height));
+    height: calc(calc(var(--vh, 1vh) * 100) - var(--searchbar-height));
     border: none;
   }
 
