@@ -4,10 +4,15 @@ import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar';
-import Navbar from './Navbar'
+import Navbar from './Navbar';
+import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
 
 // source data
 const SERVER_BASE_ENDPOINT = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_BASE_ENDPOINT_PROD : process.env.REACT_APP_SERVER_BASE_ENDPOINT_DEV;
+
+// Breakpoint at which the mobile design will we used
+const MOBILE_DESIGN_BREAKPOINT = 450;
+
 
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',
@@ -52,6 +57,9 @@ class Graph2D extends React.Component {
         processing: false,
         // root node name
         rootNode: "",
+        // viewport layout
+        width: 0,
+        height: 0,
     }
 
     constructor(props) {
@@ -91,6 +99,10 @@ class Graph2D extends React.Component {
 
     // updating the canvas dimensions
     updateDimensions = () => {
+        this.setState({
+            'width': window.innerWidth,
+            'height': window.innerHeight,
+        })
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
         let vw = window.innerWidth * 0.01;
@@ -173,6 +185,9 @@ class Graph2D extends React.Component {
                                     handleZoomOut={this.handleZoomOut}
                                 />
                             </div>
+                            {this.state.width <= MOBILE_DESIGN_BREAKPOINT ?
+                                <MobileFooter /> : <div />
+                            }
                         </div>
                     }
                 </div>
@@ -444,3 +459,16 @@ export default Graph2D;
 
 
 
+
+function MobileFooter() {
+    return (
+        <div className='mobile-footer'>
+            <span className='info-icon'>
+                <InfoIcon />
+            </span>
+            <span className='info-text'>
+                We recommend you seeing this visualization on a desktop device since you can interact with it.
+            </span>
+        </div>
+    )
+}
