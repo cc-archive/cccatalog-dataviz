@@ -3,7 +3,8 @@ import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
+import Navbar from './Navbar'
 
 // source data
 const SERVER_BASE_ENDPOINT = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_BASE_ENDPOINT_PROD : process.env.REACT_APP_SERVER_BASE_ENDPOINT_DEV;
@@ -50,7 +51,10 @@ class Graph2D extends React.Component {
         // Show processing 
         processing: false,
         // root node name
-        rootNode: ""
+        rootNode: "",
+        // layout of the viewport
+        "height": 0,
+        "width": 0,
     }
 
     constructor(props) {
@@ -60,6 +64,10 @@ class Graph2D extends React.Component {
     }
 
     componentDidMount() {
+        this.updateDimensions();
+        // Adding Event listener for resize event
+        window.addEventListener('resize', this.updateDimensions);
+
         // fetching value in data-theme key from localstorage
         let theme = window.localStorage.getItem('data-theme');
         if (!theme) {
@@ -84,16 +92,25 @@ class Graph2D extends React.Component {
             });
     }
 
+    // updating the canvas dimensions
+    updateDimensions = () => {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        let vw = window.innerWidth * 0.01;
+        document.documentElement.style.setProperty('--vw', `${vw}px`);
+    }
+
     render() {
         return (
             <React.Fragment>
-                <DarkModeSwitch toggleThemeState={this.toggleThemeHandler} />
+                <Navbar isDarkMode={this.state.isDarkMode} />
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
                     {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
                         <div className='graph-wrapper'>
+                            
                             <Sidebar
                                 isDarkMode={this.state.isDarkMode}
                                 handleSubmit={this.handleFilterSubmit}
@@ -428,10 +445,3 @@ export default Graph2D;
 
 
 
-function DarkModeSwitch({ toggleThemeState }) {
-    return (
-        <div className='darkmodeswitch' onClick={toggleThemeState}>
-            Explore CC
-        </div>
-    )
-}

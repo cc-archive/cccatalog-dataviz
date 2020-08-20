@@ -11,6 +11,7 @@
 :root {
   --searchbar-height: 60px;
   --popup-width: 36vw;
+  --navbar-height: calc(var(--vh, 1vh) * 10);
 }
 
 body {
@@ -18,10 +19,10 @@ body {
 }
 
 .graph-wrapper #graph-canvas canvas {
-  position: fixed;
-  /* Setting height after subtracting from the searchbar height */
-  /* make sure to keep this aligned with the height in Graph2D component */
-  height: 100vh !important;
+  position: absolute;
+  /* --vh and --vw are set by the Graph2D component */
+  height: calc(var(--vh, 1vh) * 100) !important;
+  width: calc(var(--vw, 1vw) * 100) !important;
 }
 
 body.modal-active .content-wrapper .graph-wrapper {
@@ -49,19 +50,6 @@ body.modal-active .content-wrapper .graph-wrapper {
   border-color: #007bff;
   cursor: pointer;
 }
-
-/* INFO BOX */
-.infoBox {
-  position: fixed;
-  top: 30vh;
-  right: 0%;
-  height: 50vh;
-  width: minmax(100px, 15vw);
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
-  color: white;
-}
-/* INFO BOX END */
 
 /* ZOOM TOOLKIT BEGIN */
 .zoomtoolkit-wrapper {
@@ -285,8 +273,9 @@ body.modal-active .searchbar-main-wrapper {
 
 /* SEARCHFILTERBOX END */
 
-/* DARK MODE SWITCH BEGIN */
-.darkmodeswitch {
+/* EXPLORE BUTTON */
+.explore-cc-btn {
+  text-decoration: none;
   position: fixed;
   z-index: 100;
   width: fit-content;
@@ -301,7 +290,8 @@ body.modal-active .searchbar-main-wrapper {
   cursor: pointer;
 }
 
-html[data-theme="dark"] .darkmodeswitch {
+
+html[data-theme="dark"] .explore-cc-btn {
   background-color: #ed592f;
 }
 
@@ -356,12 +346,12 @@ html[data-theme="dark"] .darkmodeswitch {
     z-index: 1;
     width: 100%;
     overflow-x: hidden;
-    height: calc(100vh-var(--searchbar-height));
+    height: calc(calc(var(--vh, 1vh) * 100)-var(--searchbar-height));
     border: none;
   }
 
   .licensechart-modal-content {
-    margin-top: 15vh;
+    margin-top: calc(var(--vh, 1vh) * 15);
     padding: 5px;
     vertical-align: center;
     z-index: 3;
@@ -371,10 +361,34 @@ html[data-theme="dark"] .darkmodeswitch {
 
 /* LICENSE CHART END */
 
+/* NAVBAR BEGIN */
+
+.navbar-wrapper{
+  position: fixed;
+  top:0;
+  z-index: 999;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: var(--navbar-height);
+  width: calc(var(--vw, 1vw) * 100);
+}
+
+.navbar-wrapper .cc-logo svg{
+  padding: 14px 0px 0px 14px;
+  width: 180px;
+  height: 50px;
+}
+
+
+/* NAVBAR END */
+
+
+
 /* SIDEBAR BEGIN */
 
 .sidebar-wrapper {
   position: fixed;
+  margin-top: calc(var(--navbar-height) + calc(var(--vh, 1vh)*5)) !important;
   color: white;
   display: flex;
   flex-direction: column;
@@ -382,7 +396,7 @@ html[data-theme="dark"] .darkmodeswitch {
   width: 22%;
   min-width: 150px;
   z-index: 100;
-  height: 100vh !important;
+  width: calc(var(--vw, 1vw) * 25) !important;
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
@@ -395,14 +409,6 @@ html[data-theme="dark"] .darkmodeswitch {
 html[data-theme="light"] .sidebar-wrapper {
   background-color: rgba(255, 255, 255, 0.8);
   color: black;
-}
-
-.sidebar-wrapper .cc-logo {
-  width: calc(100% - 0.2rem);
-  padding: 0 0.1rem;
-  margin-top: 2rem;
-  margin-bottom: 5rem;
-  max-height: 50px;
 }
 
 .sidebar-wrapper .project-info .project-heading {
@@ -442,9 +448,7 @@ html[data-theme="light"] .sidebar-wrapper .action-btn {
   color: #04a635;
 }
 
-.sidebar-wrapper svg {
-  width: inherit;
-}
+
 /* .actions-link{
   margin-bottom: auto;
 } */
@@ -527,4 +531,19 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 [data-reach-combobox-option] {
   padding: 6px !important;
   overflow: hidden;
+}
+
+
+@media all and (max-width:353px){
+  .navbar-wrapper .cc-logo svg{
+    padding: 14px 0px 0px 14px;
+    width: 120px;
+    height: 50px;
+  }
+
+  .explore-cc-btn {
+    width: fit-content;
+    padding: 3px 12px;
+    border-radius: 0px 0px 4px 4px;
+  }
 }
