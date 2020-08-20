@@ -4,25 +4,35 @@ import pymongo
 import os
 from dotenv import load_dotenv
 
-# Loading env variables file
-load_dotenv('../.env')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ENV_PATH=os.path.join(BASE_DIR, '..', '.env')
+
+# Loading env variables
+load_dotenv(ENV_PATH)
+
+# Path of JSON file which will be inserted to the database. 
+# A sample fdg_input_file.json can be found inside data-release/ directory.
+INPUT_FILE_PATH = os.path.join(BASE_DIR, "fdg_input_file.json")
 
 DIST = "D"  # Prefix in every node distance key [eg. D1, D2]
 REV_DIST = "RD"
-INPUT_FILENAME = "fdg_input_file.json"
 base_time = datetime.datetime.now()
 
-USERNAME = os.environ.get("MONGO_INITDB_ROOT_USERNAME")
-PASSWORD = os.environ.get("MONGO_INITDB_ROOT_PASSWORD")
-MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME")
-MONGO_COLLECTION_NAME = os.environ.get("MONGO_COLLECTION_NAME")
+# Fetching Mongo DB Credentials
+try:
+    USERNAME = os.environ['MONGO_INITDB_ROOT_USERNAME']
+    PASSWORD = os.environ['MONGO_INITDB_ROOT_PASSWORD']
+    MONGO_DB_NAME = os.environ['MONGO_DB_NAME']
+    MONGO_COLLECTION_NAME = os.environ['MONGO_COLLECTION_NAME']
+except KeyError as e:
+    raise Exception(f"Undefined ENV variable {e.args[0]}")
 
 # Change this to container_name:port inside docker container
 HOSTNAME = "localhost:27017"
 
 
-def main(input_filename=INPUT_FILENAME):
-    with open(input_filename) as f:
+def main(input_filepath=INPUT_FILE_PATH):
+    with open(input_filepath) as f:
         data = json.loads(f.read())
 
     init_adjacency_shelf(data)
