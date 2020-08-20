@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# .env file path
 ENV_PATH=os.path.join(BASE_DIR, '..', '.env')
 
 # Loading env variables
@@ -58,6 +58,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Configuring CORS
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
 else:
@@ -85,24 +86,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+# Fetching Mongo DB Credentails
+try:
+    MONGO_DB_CRED = {
+        "USERNAME": os.environ['MONGO_INITDB_ROOT_USERNAME'],
+        "PASSWORD": os.environ['MONGO_INITDB_ROOT_PASSWORD'],
+        "DB_NAME": os.environ['MONGO_DB_NAME'],
+        "COLLECTION_NAME": os.environ['MONGO_COLLECTION_NAME'],
+        "HOSTNAME": os.environ['MONGO_HOSTNAME'],
     }
-}
-
-MONGO_DB_CRED = {
-    "USERNAME": os.environ.get("MONGO_INITDB_ROOT_USERNAME"),
-    "PASSWORD": os.environ.get("MONGO_INITDB_ROOT_PASSWORD"),
-    "DB_NAME": os.environ.get("MONGO_DB_NAME"),
-    "COLLECTION_NAME": os.environ.get("MONGO_COLLECTION_NAME"),
-    "HOSTNAME": os.environ.get("MONGO_HOSTNAME"),
-}
+except KeyError as e:
+    raise Exception(f"Undefined ENV variable {e.args[0]}")
 
 
 # Password validation

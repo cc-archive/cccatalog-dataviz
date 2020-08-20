@@ -5,14 +5,14 @@ from linked_commons.models import Node
 import random, string
 import json
 import pymongo
+# Importing Mongo DB credentials
 from config.settings import MONGO_DB_CRED
 
-
+# Landing random graph maximum links and nodes
 LANDING_GRAPH_META = {
     "links": 500,
     "nodes": 500,
 }
-
 
 USERNAME = MONGO_DB_CRED["USERNAME"]
 PASSWORD = MONGO_DB_CRED["PASSWORD"]
@@ -22,6 +22,7 @@ HOSTNAME = MONGO_DB_CRED["HOSTNAME"]
 
 
 def add_nodes_metadata(node_list):
+    """Adds metadata to the nodes"""
     nodes = []
     # Adding nodes metadata
     for node in node_list:
@@ -61,7 +62,11 @@ def get_filtered_data(node_name, collection_instance):
     return {"links": links, "nodes": nodes}
 
 
-def build_random_landing_graph(db):
+def build_random_landing_graph(
+    db,
+    landing_graph_size=LANDING_GRAPH_META
+):
+    """Builds a random graph of size defined in LANDING_GRAPH_META"""
     links = []
     total_nodes = db.count()
     index = random.randint(a=1, b=total_nodes - 1)
@@ -70,8 +75,8 @@ def build_random_landing_graph(db):
     nodes_id.add(root_node)
 
     while (
-        len(nodes_id) < LANDING_GRAPH_META["nodes"]
-        and len(links) < LANDING_GRAPH_META["links"]
+        len(nodes_id) < landing_graph_size["nodes"]
+        and len(links) < landing_graph_size["links"]
     ):
         temp_nodes_id = []
         node_list = db.find_one(root_node)
