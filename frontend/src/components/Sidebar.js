@@ -47,7 +47,10 @@ function ActionsMenu(props) {
             <form onSubmit={(e) => { e.preventDefault(); props.handleSubmit({ name }) }} autoComplete='off'>
                 <div className='actions-menu-item'>
                     <label htmlFor='ac-item-graphNodeName'>Name</label>
-                    <InputSuggest id='ac-item-graphNodeName' setName={setName} placeholder='icij' value={name} SERVER_BASE_URL={SERVER_BASE_URL}/>
+                    <InputSuggest id='ac-item-graphNodeName' setName={setName}
+                        placeholder='icij'
+                        value={name}
+                        SERVER_BASE_URL={SERVER_BASE_URL} />
                 </div>
                 <div className={`actions-menu-item ${name === '' ? 'disabled' : ''}`}>
                     <button disabled={name === '' || processing}>{processing ? 'Loading' : 'Filter Graph'}</button>

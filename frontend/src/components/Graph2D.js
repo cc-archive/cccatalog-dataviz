@@ -52,9 +52,6 @@ class Graph2D extends React.Component {
         processing: false,
         // root node name
         rootNode: "",
-        // layout of the viewport
-        "height": 0,
-        "width": 0,
     }
 
     constructor(props) {
