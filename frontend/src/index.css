@@ -310,52 +310,6 @@ html[data-theme="dark"] .explore-cc-btn {
   z-index: 1000;
 }
 
-@media only screen and (min-width: 900px) {
-  /* Overriding pop up styling on other elements */
-  body.modal-active .content-wrapper .graph-wrapper {
-    -webkit-filter: none;
-    filter: none;
-    pointer-events: all;
-  }
-  body.modal-active .searchbar-main-wrapper {
-    -webkit-filter: none;
-    filter: none;
-    pointer-events: all;
-  }
-
-  body.modal-active .content-wrapper {
-    display: grid;
-    grid-template-columns: 2fr 5fr;
-    grid-auto-flow: row;
-  }
-
-  #licensechart {
-    grid-column-start: 1;
-    grid-column-end: 2;
-    background: white;
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
-    display: block;
-    padding: 0;
-    margin: 0;
-    z-index: 1;
-    width: 100%;
-    overflow-x: hidden;
-    height: calc(calc(var(--vh, 1vh) * 100) - var(--searchbar-height));
-    border: none;
-  }
-
-  .licensechart-modal-content {
-    margin-top: calc(var(--vh, 1vh) * 15);
-    padding: 5px;
-    vertical-align: center;
-    z-index: 3;
-    justify-content: space-between;
-  }
-}
-
 /* LICENSE CHART END */
 
 /* NAVBAR BEGIN */
