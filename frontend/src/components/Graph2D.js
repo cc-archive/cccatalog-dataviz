@@ -103,14 +103,16 @@ class Graph2D extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <Navbar isDarkMode={this.state.isDarkMode} />
+                <Navbar
+                    isDarkMode={this.state.isDarkMode}
+                    toggleThemeHandler={this.toggleThemeHandler} />
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
                     {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
                         <div className='graph-wrapper'>
-                            
+
                             <Sidebar
                                 isDarkMode={this.state.isDarkMode}
                                 handleSubmit={this.handleFilterSubmit}
