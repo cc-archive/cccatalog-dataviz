@@ -147,17 +147,17 @@ class Graph2D extends React.Component {
                                             // node not highlighted
                                             if (this.state.isDarkMode) {
                                                 if (link.source.id === this.state.rootNode) {
-                                                    return '#D1DCF1';
+                                                    return '#FF0000';
                                                 } else if (link.target.id === this.state.rootNode) {
-                                                    return '#eb5721';
+                                                    return '#40E0D0';
                                                 } else {
                                                     return darkThemeData.linkColor;
                                                 }
                                             } else {
                                                 if (link.source.id === this.state.rootNode) {
-                                                    return '#F5D400';
+                                                    return '#FF0000';
                                                 } else if (link.target.id === this.state.rootNode) {
-                                                    return '#04A635';
+                                                    return '#40E0D0';
                                                 } else {
                                                     return lightThemeData.linkColor;
                                                 }
