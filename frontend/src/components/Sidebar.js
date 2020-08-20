@@ -7,6 +7,12 @@ class Sidebar extends Component {
         'name': '',
     }
 
+    componentDidMount(){
+        this.setState({
+            isActionsActive: this.props.showActionInitialState
+        })
+    }
+
     setName = (newVal) => {
         this.setState({
             name: newVal

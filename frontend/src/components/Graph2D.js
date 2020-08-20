@@ -6,6 +6,7 @@ import ZoomToolkit from './ZoomToolkit';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
+import {ReactComponent as Spinner} from '../assets/icons/spinner.svg';
 
 // source data
 const SERVER_BASE_ENDPOINT = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_BASE_ENDPOINT_PROD : process.env.REACT_APP_SERVER_BASE_ENDPOINT_DEV;
@@ -114,15 +115,17 @@ class Graph2D extends React.Component {
             <React.Fragment>
                 <Navbar
                     isDarkMode={this.state.isDarkMode}
+                    isLoading={this.state.loading}
                     toggleThemeHandler={this.toggleThemeHandler} />
                 <div className='content-wrapper'>
 
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
-                    {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
+                    {this.state.loading ? <div className='loader'> <Spinner/></div> :
                         <div className='graph-wrapper'>
 
                             <Sidebar
+                                showActionInitialState={this.state.width >= MOBILE_DESIGN_BREAKPOINT}
                                 isDarkMode={this.state.isDarkMode}
                                 handleSubmit={this.handleFilterSubmit}
                                 processing={this.state.processing}
@@ -183,6 +186,7 @@ class Graph2D extends React.Component {
                                 <ZoomToolkit
                                     handleZoomIn={this.handleZoomIn}
                                     handleZoomOut={this.handleZoomOut}
+                                    resetZoom={this.resetZoom}
                                 />
                             </div>
                             {this.state.width <= MOBILE_DESIGN_BREAKPOINT ?
@@ -204,6 +208,11 @@ class Graph2D extends React.Component {
         document.documentElement.setAttribute('data-theme', newTheme);
     }
 
+    // Reset the current zoom and fit the graph to viewport's canvas
+    resetZoom = () => {
+        this.graphRef.current.zoomToFit();
+    }
+
     // Update the data and simulates the graph rendering 
     simulateForceGraph = (res) => {
         let obj = {};
@@ -220,11 +229,13 @@ class Graph2D extends React.Component {
         this.setState({
             loading: false
         })
-        this.graphRef.current.d3Force('charge', null)
-        this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
+        if (this.graphRef.current) {
+            this.graphRef.current.d3Force('charge', null)
+            this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
 
-        if (this.state.graphData['nodes'].length < 300)
-            this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
+            if (this.state.graphData['nodes'].length < 300)
+                this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
+        }
     }
 
     searchNodesInDepth(adjacencyList, node, visited, maxLevel, currLevel, links) {

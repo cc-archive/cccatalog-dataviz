@@ -15,7 +15,21 @@
 }
 
 body {
+  overflow-y: hidden;
   overflow-x: hidden;
+}
+
+.loader{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+#graph-canvas{
+  height: calc(var(--vh, 1vh) * 100) !important;
+  width: calc(var(--vw, 1vw) * 100) !important;
 }
 
 .graph-wrapper #graph-canvas canvas {
@@ -84,14 +98,9 @@ body.modal-active .content-wrapper .graph-wrapper {
   box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);
 }
 
-.zoomtoolkit-wrapper button:active svg {
-  opacity: 1;
-}
-
 .zoomtoolkit-wrapper button svg {
-  width: 20px;
-  height: 20px;
-  opacity: 0.8;
+  width: 22px;
+  height: 22px;
 }
 
 .zoomtoolkit-wrapper button:focus {
@@ -352,13 +361,13 @@ html[data-theme="dark"] .explore-cc-btn {
 /* NAVBAR BEGIN */
 
 .navbar-wrapper {
-  position: fixed;
+  position: absolute;
   top: 0;
   z-index: 999;
   display: grid;
   grid-template-columns: 4fr 3fr 1fr;
   height: var(--navbar-height);
-  width: calc(var(--vw, 1vw) * 100);
+  width: 100%;
 }
 
 .navbar-wrapper .cc-logo svg {
@@ -404,7 +413,6 @@ html[data-theme="dark"] .explore-cc-btn {
   justify-content: flex-start;
   width: 22%;
   min-width: 150px;
-  /* padding: 6px 10px; */
   border-radius: 4px;
   z-index: 100;
   width: calc(var(--vw, 1vw) * 25);
@@ -561,6 +569,10 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
   .sidebar-wrapper {
     width: 100vw;
   }
+  .zoomtoolkit-wrapper {
+    bottom: 50px;
+    right: 5px;
+  }
   .actions-menu-wrapper form {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -583,10 +595,6 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 
 
 @media all and (max-width: 384px) {
-  .zoomtoolkit-wrapper {
-    bottom: 50px;
-    right: 5px;
-  }
   .zoomtoolkit-wrapper button svg {
     width: 15px;
     height: 15px;

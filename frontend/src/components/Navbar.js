@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ReactComponent as LightLogo } from '../assets/logo/light-logo.svg';
-import { ReactComponent as DarkLogo } from '../assets/logo/dark-logo.svg';
+import { ReactComponent as DarkLogo } from '../assets/logo/light-logo.svg';
+import { ReactComponent as LightLogo } from '../assets/logo/dark-logo.svg';
 import { ReactComponent as SunIcon } from '../assets/icons/sun.svg';
 import { ReactComponent as MoonIcon } from '../assets/icons/moon.svg';
 
@@ -9,7 +9,7 @@ class Navbar extends Component {
         return (
             <div className='navbar-wrapper'>
                 <div className='cc-logo'>
-                    {this.props.isDarkMode ? <DarkLogo /> : <LightLogo />}
+                    {(!this.props.isDarkMode || this.props.isLoading===true) ?  <DarkLogo /> : <LightLogo />}
                 </div>
                 <a className='explore-cc-btn' href='https://creativecommons.org/' target='__blank'>
                     Explore CC
