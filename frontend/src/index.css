@@ -292,6 +292,21 @@ html[data-theme="dark"] .explore-cc-btn {
   background-color: #ed592f;
 }
 
+.explore-cc-btn:hover {
+  background-color: #ed592f;
+  color: white;
+}
+
+[data-theme="dark"] .explore-cc-btn {
+  color: white;
+  background-color: #ed592f;
+}
+
+[data-theme="dark"] .explore-cc-btn:hover {
+  background-color: white;
+  color: black;
+}
+
 /* DARK MODE SWITCH END */
 
 /* LICENSE CHART BEGIN */
@@ -333,7 +348,8 @@ html[data-theme="dark"] .explore-cc-btn {
 .darkmodeswitch {
   justify-self: center;
   cursor: pointer;
-  color: black;
+  color: white;
+  background-color: black;
   height: fit-content;
   padding: 4px 10px 0px 10px;
   border-radius: 0px 0px 4px 4px;
@@ -341,12 +357,13 @@ html[data-theme="dark"] .explore-cc-btn {
 }
 
 .darkmodeswitch:hover {
-  background-color: black;
+  background-color: #ed592f;
   color: white;
 }
 
 [data-theme="dark"] .darkmodeswitch {
   color: white;
+  background-color: #ed592f;
 }
 
 [data-theme="dark"] .darkmodeswitch:hover {
@@ -561,7 +578,7 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 }
 
 
-@media all and (max-width: 353px) {
+@media all and (max-width: 396px) {
   .navbar-wrapper .cc-logo svg {
     width: 120px;
     height: 50px;
@@ -582,6 +599,7 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 
   .darkmodeswitch svg {
     width: 18px;
+    height: 18px;
   }
 
   #ac-item-graphNodeName {
