@@ -34,6 +34,7 @@ body {
 }
 
 .graph-wrapper #graph-canvas canvas {
+  z-index: 90;
   position: absolute;
   /* --vh and --vw are set by the Graph2D component */
   height: calc(var(--vh, 1vh) * 100) !important;
@@ -41,7 +42,8 @@ body {
   transition: all var(--animation-duration) ease 0s;
 }
 
-body.modal-active .content-wrapper .graph-wrapper {
+
+body.modal-active .content-wrapper .graph-wrapper,  body.modal-active .navbar-wrapper{
   -webkit-filter: blur(5px) grayscale(50%);
   filter: blur(5px) grayscale(50%);
   pointer-events: none;
@@ -338,7 +340,7 @@ html[data-theme="dark"] .explore-cc-btn {
   display: grid;
   grid-template-columns: 4fr 3fr 1fr;
   height: var(--navbar-height);
-  transition: all calc(var(--animation-duration) - 0.4s) ease 0s, background-color 0ms;
+  transition: all calc(var(--animation-duration) - 0.2s) ease 0s, background-color 0ms;
   width: 100%;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -347,6 +349,8 @@ html[data-theme="dark"] .explore-cc-btn {
   -ms-user-select: none;
   user-select: none;
 }
+
+
 
 .navbar-wrapper .cc-logo svg {
   padding: 14px 0px 0px 14px;
@@ -378,7 +382,7 @@ html[data-theme="dark"] .explore-cc-btn {
   position: fixed;
   margin-top: calc(var(--navbar-height));
   padding-top: calc(var(--vh, 1vh) * 5);
-  transition: all calc(var(--animation-duration) - 0.4s) ease 0s, background-color 0ms;
+  transition: all calc(var(--animation-duration)) ease 0s, background-color 0ms;
   color: white;
   display: flex;
   flex-direction: column;
@@ -386,11 +390,13 @@ html[data-theme="dark"] .explore-cc-btn {
   width: 22%;
   min-width: 150px;
   border-radius: 0px 4px 4px 0px;
-  z-index: 999;
+  z-index: 100;
   width: calc(var(--vw, 1vw) * 25);
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+
 
 .sidebar-wrapper a,
 .sidebar-wrapper .action-btn {
@@ -549,7 +555,7 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
   .navbar-wrapper {
     background-color: rgba(0, 0, 0, 0.5);
   }
-  html[data-theme="light"] .navbar-wrapper {
+  html[data-theme="light"] .navbar-wrapper, .navbar-wrapper.loading {
     background-color: rgba(255, 255, 255, 0.8);
   }
   .actions-menu-wrapper form {

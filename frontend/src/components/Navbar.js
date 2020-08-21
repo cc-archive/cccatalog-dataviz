@@ -7,7 +7,7 @@ import { ReactComponent as MoonIcon } from '../assets/icons/moon.svg';
 class Navbar extends Component {
     render() {
         return (
-            <div className='navbar-wrapper'>
+            <div className={`navbar-wrapper ${this.props.isLoading===true ? 'loading' : ''}`}>
                 <div className='cc-logo'>
                     {(!this.props.isDarkMode || this.props.isLoading===true) ?  <DarkLogo /> : <LightLogo />}
                 </div>
