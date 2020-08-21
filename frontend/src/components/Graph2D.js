@@ -446,7 +446,7 @@ class Graph2D extends React.Component {
         if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
         const label = `${link.source.id} > ${link.target.id}`;
         // estimate fontSize to fit in link length
-        ctx.font = '2px Sans-Serif';
+        ctx.font = '2px Source Sans Pro';
         const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
         ctx.font = `${fontSize}px Sans-Serif`;
         const textWidth = ctx.measureText(label).width;
@@ -455,11 +455,11 @@ class Graph2D extends React.Component {
         ctx.save();
         ctx.translate(textPos.x, textPos.y);
         ctx.rotate(textAngle);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = this.state.isDarkMode ? 'rgba(0, 0, 0, 0.2)' : 'rgba(1, 1, 1, 0.2)' ;
         ctx.fillRect(- bckgDimensions[0] / 2, - bckgDimensions[1] / 2, ...bckgDimensions);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'lightgrey'; // '#C8C8C8'; // '#E8E8E8'; // 'lightgrey';
+        ctx.fillStyle = this.state.isDarkMode ? 'lightgrey' : 'black'; // '#C8C8C8'; // '#E8E8E8'; // 'lightgrey';
         ctx.fillText(label, 0, 0);
         ctx.restore();
     }
