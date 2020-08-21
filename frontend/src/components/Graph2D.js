@@ -78,8 +78,8 @@ class Graph2D extends React.Component {
         let theme = window.localStorage.getItem('data-theme');
         if (!theme) {
             // data-theme key is not present in local storage
-            window.localStorage.setItem('data-theme', 'dark'); // dark || light
-            theme = 'dark';
+            window.localStorage.setItem('data-theme', 'light'); // dark || light
+            theme = 'light';
         }
         // setting data-theme attribute
         document.documentElement.setAttribute('data-theme', theme);

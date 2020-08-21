@@ -12,6 +12,7 @@
   --searchbar-height: 60px;
   --popup-width: 36vw;
   --navbar-height: calc(var(--vh, 1vh) * 10);
+  --animation-duration: 0.7s;
 }
 
 body {
@@ -37,6 +38,7 @@ body {
   /* --vh and --vw are set by the Graph2D component */
   height: calc(var(--vh, 1vh) * 100) !important;
   width: calc(var(--vw, 1vw) * 100) !important;
+  transition: all var(--animation-duration) ease 0s;
 }
 
 body.modal-active .content-wrapper .graph-wrapper {
@@ -336,6 +338,7 @@ html[data-theme="dark"] .explore-cc-btn {
   display: grid;
   grid-template-columns: 4fr 3fr 1fr;
   height: var(--navbar-height);
+  transition: all calc(var(--animation-duration) - 0.4s) ease 0s, background-color 0ms;
   width: 100%;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -375,14 +378,15 @@ html[data-theme="dark"] .explore-cc-btn {
   position: fixed;
   margin-top: calc(var(--navbar-height));
   padding-top: calc(var(--vh, 1vh) * 5);
+  transition: all calc(var(--animation-duration) - 0.4s) ease 0s, background-color 0ms;
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 22%;
   min-width: 150px;
-  border-radius: 4px;
-  z-index: 100;
+  border-radius: 0px 4px 4px 0px;
+  z-index: 999;
   width: calc(var(--vw, 1vw) * 25);
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
@@ -536,6 +540,7 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 @media all and (max-width: 450px) {
   .sidebar-wrapper {
     width: 100vw;
+    border-radius: 0px;
   }
   .zoomtoolkit-wrapper {
     bottom: 50px;
@@ -567,17 +572,7 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
   }
 }
 
-@media all and (max-width: 384px) {
-  .zoomtoolkit-wrapper button svg {
-    width: 15px;
-    height: 15px;
-    opacity: 0.8;
-  }
 
-  .title-main {
-    font-size: 1rem;
-  }
-}
 
 @media all and (max-width: 396px) {
   .navbar-wrapper .cc-logo svg {
@@ -604,12 +599,24 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
   }
 
   #ac-item-graphNodeName {
-    width: 100px;
+    width: 70%;
     margin-left: 10px;
   }
 
   .actions-menu-item button {
     padding: 8px 20px;
+  }
+}
+
+@media all and (max-width: 384px) {
+  .zoomtoolkit-wrapper button svg {
+    width: 15px;
+    height: 15px;
+    opacity: 0.8;
+  }
+
+  .title-main {
+    font-size: 1rem;
   }
 }
 
