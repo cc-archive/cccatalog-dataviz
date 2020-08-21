@@ -210,7 +210,8 @@ class Graph2D extends React.Component {
 
     // Reset the current zoom and fit the graph to viewport's canvas
     resetZoom = () => {
-        this.graphRef.current.zoomToFit();
+        // Animating the transition for 1 sec
+        this.graphRef.current.zoomToFit(1000);
     }
 
     // Update the data and simulates the graph rendering 
