@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # .env file path
-ENV_PATH=os.path.join(BASE_DIR, '..', '.env')
+ENV_PATH = os.path.join(BASE_DIR, "..", ".env")
 
 # Loading env variables
 load_dotenv(ENV_PATH)
@@ -89,11 +89,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Fetching Mongo DB Credentails
 try:
     MONGO_DB_CRED = {
-        "USERNAME": os.environ['MONGO_INITDB_ROOT_USERNAME'],
-        "PASSWORD": os.environ['MONGO_INITDB_ROOT_PASSWORD'],
-        "DB_NAME": os.environ['MONGO_DB_NAME'],
-        "COLLECTION_NAME": os.environ['MONGO_COLLECTION_NAME'],
-        "HOSTNAME": os.environ['MONGO_HOSTNAME'],
+        "USERNAME": os.environ["MONGO_INITDB_ROOT_USERNAME"],
+        "PASSWORD": os.environ["MONGO_INITDB_ROOT_PASSWORD"],
+        "DB_NAME": os.environ["MONGO_DB_NAME"],
+        "COLLECTION_NAME": os.environ["MONGO_COLLECTION_NAME"],
+        "HOSTNAME": os.environ["MONGO_HOSTNAME"],
     }
 except KeyError as e:
     raise Exception(f"Undefined ENV variable {e.args[0]}")
