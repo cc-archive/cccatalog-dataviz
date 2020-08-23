@@ -11,5 +11,3 @@ RUN pip install -r ./requirements.txt
 
 # copy project
 COPY ./src ./src
-COPY ./nginx ./nginx
-COPY ./.env ./
