@@ -3,6 +3,11 @@ import datetime
 import pymongo
 import os
 from dotenv import load_dotenv
+import sys
+
+"""Run the build_db_script.py with the HOSTNAME of the MongoDB server 
+Command: python build_db_script.py HOSTNAME
+"""
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ENV_PATH=os.path.join(BASE_DIR, '..', '.env')
@@ -27,8 +32,10 @@ try:
 except KeyError as e:
     raise Exception(f"Undefined ENV variable {e.args[0]}")
 
-# Change this to container_name:port inside docker container
-HOSTNAME = "localhost:27017"
+HOST = sys.argv[1]
+PORT = "27017"
+# Change this to the actual port of the mongoDB server
+SOCKET = f"{HOST}:{PORT}"
 
 
 def main(input_filepath=INPUT_FILE_PATH):
@@ -48,7 +55,9 @@ def init_adjacency_shelf(aggregate_data):
         f"{datetime.datetime.now() - base_time}"
         f" Saving Adjacency map to MongoDB: {MONGO_DB_NAME}"
     )
-    client = pymongo.MongoClient(f"mongodb://{USERNAME}:{PASSWORD}@{HOSTNAME}")
+    MONGO_URL=f"mongodb://{USERNAME}:{PASSWORD}@{SOCKET}"
+    print(f"Connecting to {MONGO_URL}")
+    client = pymongo.MongoClient(f"{MONGO_URL}")
     db = client.get_database(name=MONGO_DB_NAME)
     node_collection = db.get_collection(name=MONGO_COLLECTION_NAME)
     count = 0
@@ -112,3 +121,4 @@ def add_node_metadata(adjacency_map, aggregate_data):
 
 if __name__ == "__main__":
     main()
+
