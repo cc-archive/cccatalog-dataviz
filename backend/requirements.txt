@@ -1,6 +1,7 @@
 Django==2.2.13
-django-cors-headers
-pymongo
-dnspython
-gunicorn
-python-dotenv
+django-cors-headers==3.2.1
+dnspython==2.0.0
+gunicorn==19.9.0
+pymongo==3.11.0
+python-dotenv==0.10.3
+
