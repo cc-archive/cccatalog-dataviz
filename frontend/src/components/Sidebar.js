@@ -3,16 +3,21 @@ import InputSuggest from './InputSuggest'
 
 class Sidebar extends Component {
     state = {
+        // stores the state if actions menu is active or not
         'isActionsActive': true,
+        // store the node name
         'name': '',
     }
 
     componentDidMount(){
+        // setting the state of the actions action based on value sent as props
+        // from the parent component 
         this.setState({
             isActionsActive: this.props.showActionInitialState
         })
     }
 
+    // function to update the {name} variable
     setName = (newVal) => {
         this.setState({
             name: newVal
@@ -44,7 +49,7 @@ class Sidebar extends Component {
 
 export default Sidebar;
 
-
+// actions menu component
 function ActionsMenu(props) {
     let { name, setName, processing, SERVER_BASE_URL } = props;
 
@@ -65,3 +70,5 @@ function ActionsMenu(props) {
         </div>
     )
 }
+
+

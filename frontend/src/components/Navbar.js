@@ -26,7 +26,7 @@ class Navbar extends Component {
 export default Navbar;
 
 
-
+// dark mode switch component
 function DarkModeSwitch({ isDarkMode, toggleThemeHandler }) {
     return (
         <div className='darkmodeswitch' onClick={toggleThemeHandler}>
@@ -34,3 +34,5 @@ function DarkModeSwitch({ isDarkMode, toggleThemeHandler }) {
         </div>
     )
 }
+
+

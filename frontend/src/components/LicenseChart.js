@@ -24,12 +24,16 @@ class LicenseChart extends React.Component {
         )
     }
 
+    // checking if there is any change in the {node} variable sent as props 
+    // determining if the component should update or not
     shouldComponentUpdate(props){
         if(this.props.node === props.node){
             return false;
         }
         return true;
     }
+
+    // generates the renderable UI of the piechart
     getPieChart() {
         // assumes that node has provider_domain
         let node = this.props.node;
@@ -43,7 +47,7 @@ class LicenseChart extends React.Component {
             //push that dictionary to a list
             licensed_data.push(element)
         }
-
+        // making the config object for the react-highcharts
         let config = {
             exporting: {
                 showTable: false,
@@ -83,6 +87,8 @@ class LicenseChart extends React.Component {
                 data: licensed_data
             }]
         };
+
+        // returning the react highcharts renderable UI of the piehart
         return <ReactHighcharts config={config}></ReactHighcharts>;
     }
 
@@ -102,3 +108,4 @@ class LicenseChart extends React.Component {
 
 
 export default LicenseChart;
+
