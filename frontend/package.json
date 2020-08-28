@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react-dom": "^16.13.1",
-    "react": "^16.13.1",
-    "react-highcharts": "^16.1.0",
-    "@testing-library/react": "^10.4.8",
-    "react-scripts": "3.4.0",
-    "@testing-library/user-event": "^12.1.0",
-    "react-router-dom": "^5.2.0",
+    "@reach/combobox": "^0.10.5",
     "@testing-library/jest-dom": "^5.11.2",
+    "@testing-library/react": "^10.4.8",
+    "@testing-library/user-event": "^12.1.0",
     "d3-force": "^2.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "react-force-graph": "^1.36.7",
-    "@reach/combobox": "^0.10.5"
+    "react-highcharts": "^16.1.0",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.0"
   },
   "scripts": {
     "start": "react-scripts start",

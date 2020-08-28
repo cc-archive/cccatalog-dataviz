@@ -3,11 +3,19 @@ import { forceManyBody, forceCollide } from 'd3-force';
 import { ForceGraph2D } from 'react-force-graph';
 import LicenseChart from './LicenseChart';
 import ZoomToolkit from './ZoomToolkit';
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+import { ReactComponent as InfoIcon } from '../assets/icons/info.svg';
+// Importing the Loader
+import { ReactComponent as Spinner } from '../assets/icons/spinner.svg';
 
 // source data
 const SERVER_BASE_ENDPOINT = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_BASE_ENDPOINT_PROD : process.env.REACT_APP_SERVER_BASE_ENDPOINT_DEV;
 
+// Breakpoint at which the mobile design will we used
+const MOBILE_DESIGN_BREAKPOINT = 450;
+
+// dark theme metadata
 const darkThemeData = {
     'linkColor': 'rgba(196, 196, 196, 0.3)',
     'hoverLinkColor': '#fff',
@@ -16,6 +24,7 @@ const darkThemeData = {
     'nodeTextColor': '#000'
 }
 
+// light theme metadata
 const lightThemeData = {
     'linkColor': '#D8D8D8',
     'hoverLinkColor': '#2f4f4f',
@@ -50,22 +59,30 @@ class Graph2D extends React.Component {
         // Show processing 
         processing: false,
         // root node name
-        rootNode: ""
+        rootNode: "",
+        // viewport layout
+        width: 0,
+        height: 0,
     }
 
-    constructor(props) {
+    constructor() {
         super();
         this.graphRef = React.createRef();
         this.state.highlightNodes = new Map();
     }
 
     componentDidMount() {
+        // loading the dimensions
+        this.updateDimensions();
+        // Adding Event listener for resize event to update the viewport dimensions
+        window.addEventListener('resize', this.updateDimensions);
+
         // fetching value in data-theme key from localstorage
         let theme = window.localStorage.getItem('data-theme');
         if (!theme) {
             // data-theme key is not present in local storage
-            window.localStorage.setItem('data-theme', 'dark'); // dark || light
-            theme = 'dark';
+            window.localStorage.setItem('data-theme', 'light'); // dark || light
+            theme = 'light';
         }
         // setting data-theme attribute
         document.documentElement.setAttribute('data-theme', theme);
@@ -84,17 +101,34 @@ class Graph2D extends React.Component {
             });
     }
 
+    // updating the canvas dimensions
+    updateDimensions = () => {
+        this.setState({
+            'width': window.innerWidth,
+            'height': window.innerHeight,
+        })
+        // setting --vh and --vw variables of css
+        let vh = window.innerHeight * 0.01;
+        let vw = window.innerWidth * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);
+    }
+
     render() {
         return (
             <React.Fragment>
-                <DarkModeSwitch toggleThemeState={this.toggleThemeHandler} />
+                <Navbar
+                    isDarkMode={this.state.isDarkMode}
+                    isLoading={this.state.loading}
+                    toggleThemeHandler={this.toggleThemeHandler} />
                 <div className='content-wrapper'>
-
                     {this.state.licenseChartState ? <LicenseChart node={this.state.node} handler={this.toggleLicenseChartState} /> : null}
 
-                    {this.state.loading ? <h1 style={{ textAlign: "center", 'marginTop': '40vh', transform: 'translateY(-40%)' }}>loading...</h1> :
+                    {this.state.loading ? <div className='loader'> <Spinner /></div> :
                         <div className='graph-wrapper'>
+
                             <Sidebar
+                                showActionInitialState={this.state.width >= MOBILE_DESIGN_BREAKPOINT}
                                 isDarkMode={this.state.isDarkMode}
                                 handleSubmit={this.handleFilterSubmit}
                                 processing={this.state.processing}
@@ -116,17 +150,17 @@ class Graph2D extends React.Component {
                                             // node not highlighted
                                             if (this.state.isDarkMode) {
                                                 if (link.source.id === this.state.rootNode) {
-                                                    return '#D1DCF1';
+                                                    return '#FF0000';
                                                 } else if (link.target.id === this.state.rootNode) {
-                                                    return '#eb5721';
+                                                    return '#40E0D0';
                                                 } else {
                                                     return darkThemeData.linkColor;
                                                 }
                                             } else {
                                                 if (link.source.id === this.state.rootNode) {
-                                                    return '#F5D400';
+                                                    return '#FF0000';
                                                 } else if (link.target.id === this.state.rootNode) {
-                                                    return '#04A635';
+                                                    return '#40E0D0';
                                                 } else {
                                                     return lightThemeData.linkColor;
                                                 }
@@ -155,8 +189,12 @@ class Graph2D extends React.Component {
                                 <ZoomToolkit
                                     handleZoomIn={this.handleZoomIn}
                                     handleZoomOut={this.handleZoomOut}
+                                    resetZoom={this.resetZoom}
                                 />
                             </div>
+                            {this.state.width <= MOBILE_DESIGN_BREAKPOINT ?
+                                <MobileFooter /> : <div />
+                            }
                         </div>
                     }
                 </div>
@@ -164,6 +202,7 @@ class Graph2D extends React.Component {
         )
     }
 
+    // helper function to toggle the current theme and update the data-theme attribute
     toggleThemeHandler = () => {
         let newTheme = this.state.isDarkMode ? 'light' : 'dark';
         this.setState({
@@ -173,54 +212,61 @@ class Graph2D extends React.Component {
         document.documentElement.setAttribute('data-theme', newTheme);
     }
 
+    // Reset the current zoom and fit the graph to viewport's canvas
+    resetZoom = () => {
+        // animating the transition for 1 sec
+        this.graphRef.current.zoomToFit(1000);
+    }
+
     // Update the data and simulates the graph rendering 
     simulateForceGraph = (res) => {
         let obj = {};
+        // building the linksPerDomain which is a 
+        // lightweight adjacency list representation of the graph
         res.links.forEach((e) => {
             if (obj[e.source] === undefined) {
                 obj[e.source] = {}
             }
             obj[e.source][e.target] = [{ value: e.value }]
         })
+        // updating the state
         this.setState({
             graphData: res,
             linksPerDomains: obj
         })
+        // setting the loading as false
         this.setState({
             loading: false
         })
-        this.graphRef.current.d3Force('charge', null)
-        this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
 
-        if (this.state.graphData['nodes'].length < 300)
-            this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
-    }
-
-    searchNodesInDepth(adjacencyList, node, visited, maxLevel, currLevel, links) {
-        visited.set(node, true);
-        let neighbours = adjacencyList[node];
-        if (currLevel === maxLevel || !neighbours) {
-            // if current level is equal to max level stoping the traversal
-            return;
+        // checking if the graphRef is not null
+        if (this.graphRef.current) {
+            this.graphRef.current.d3Force('charge', null)
+            this.graphRef.current.d3Force('charge', forceManyBody().strength(-120))
+            // performing collision among the nodes if the number of nodes are <300
+            // limiting the usage since it's resource intensive and causes throttling
+            if (this.state.graphData['nodes'].length < 300)
+                this.graphRef.current.d3Force('collide', forceCollide(this.state.nodeRelSize))
         }
-        Object.entries(neighbours).forEach(neighbour => {
-            if (!visited.has(neighbour[0])) {
-                // not yet visited
-                links.push({ source: node, target: neighbour[0], value: neighbour[1][0]['value'] })
-                // calling searchNodesInDepth again and incrementing the level by 1
-                this.searchNodesInDepth(adjacencyList, neighbour[0], visited, maxLevel, currLevel + 1, links);
-            }
-        })
     }
 
-    // server side filtering
+
+    // handles server side filtering
+    // fetches the data and updates the graph
     fetchFilteredData = async (nodeName) => {
-        nodeName = nodeName.toLowerCase();
+        // converting and removing the spaces from start and end from the nodeName
+        nodeName = nodeName.trimEnd().trimStart().toLowerCase();
+        // setting the processing state as true
         this.setState({
             processing: true,
         })
         try {
             let rootNode = nodeName;
+            if (rootNode === "") {
+                alert(`Please enter a valid node name`)
+                // raising error
+                throw Error("Please enter a valid node name")
+            }
             let res = await fetch(`${SERVER_BASE_ENDPOINT}/graph-data?name=${nodeName}`);
             let jsonData = await res.json();
 
@@ -230,11 +276,14 @@ class Graph2D extends React.Component {
                 })
                 alert(`Error Occurred: ${jsonData['message']}`)
             } else {
+                // simulating the graph rendering
                 this.simulateForceGraph(jsonData);
+                // animating after 500 ms
                 setTimeout(() => {
                     this.graphRef.current.zoomToFit(1000, 10)
                 }, 500)
 
+                // setting rootNode variable to differently colour incoming and outgoing links
                 this.setState({
                     "rootNode": rootNode,
                 })
@@ -246,17 +295,19 @@ class Graph2D extends React.Component {
             processing: false
         })
     }
+
     // Handles Filtering by node name
     handleFilterSubmit = (payload) => {
         this.fetchFilteredData(payload.name);
     }
 
-
+    // wrapper function to zoom out of the graph canvas
     handleZoomOut = () => {
         // Decrementing zoom level by zoom step
         this.graphRef.current.zoom(this.state.currentZoomLevel - this.getZoomStep(this.state.currentZoomLevel), 250);
     }
 
+    // wrapper function to zoom into the graph canvas
     handleZoomIn = () => {
         // Incrementing zoom level by zoom step
         this.graphRef.current.zoom(this.state.currentZoomLevel + this.getZoomStep(this.state.currentZoomLevel), 250);
@@ -280,31 +331,39 @@ class Graph2D extends React.Component {
         document.body.classList.remove('modal-active');
     }
 
+    // activates the modal with license information
     handleOnNodeClick = (node) => {
         if (node) {
+            // zooming into the selected node
             this.graphRef.current.centerAt(node.x, node.y, 1000);
             this.graphRef.current.zoom(5, 2000);
             setTimeout(() => {
+                // activating the license chart modal
                 this.setState({
                     licenseChartState: true,
                     node: node
                 })
+                // adding modal-active class to body element
                 document.body.classList.add('modal-active');
             }, 500);
         }
 
     }
 
-    handleOnNodeHover = node => {
+    // traverses all links accessible from the {domain} and highlights them
+    handleOnNodeHover = (node) => {
         // setting cursor style to pointer
         document.body.style.cursor = node ? 'pointer' : null;
+        // clearing all previously highlighted links
         this.state.highlightNodes.clear();
         if (node) {
+            // calling travereHighlight method to traverse all links accessible from the node
             this.traverseHighlight(node.id);
         }
     }
 
 
+    // traverses all links accessible from the {domain} and highlights them
     traverseHighlight(domain, degree = -1) {
         if (!domain) return;
         if (this.state.highlightNodes.has(domain)) { // already been here
@@ -312,12 +371,14 @@ class Graph2D extends React.Component {
             return;
         }
         this.state.highlightNodes.set(domain, degree);
+        // traversing all nodes which are immediate neighbours of the {domain}
         Object.entries(this.state.linksPerDomains[domain] || {})
             .forEach(([targetDomain]) => this.traverseHighlight(targetDomain, degree + 1));
 
     }
 
-    // callback function to handle on zoom end
+    // callback function to handle on zoom end event
+    // updates the state variable {currentZoomLevel} 
     handleZoomEnd = (e) => {
         // updating current zoom level
         this.setState({
@@ -404,7 +465,7 @@ class Graph2D extends React.Component {
         if (textAngle < -Math.PI / 2) textAngle = -(-Math.PI - textAngle);
         const label = `${link.source.id} > ${link.target.id}`;
         // estimate fontSize to fit in link length
-        ctx.font = '2px Sans-Serif';
+        ctx.font = '2px Source Sans Pro';
         const fontSize = Math.min(MAX_FONT_SIZE, maxTextLength / ctx.measureText(label).width);
         ctx.font = `${fontSize}px Sans-Serif`;
         const textWidth = ctx.measureText(label).width;
@@ -413,11 +474,11 @@ class Graph2D extends React.Component {
         ctx.save();
         ctx.translate(textPos.x, textPos.y);
         ctx.rotate(textAngle);
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = this.state.isDarkMode ? 'rgba(0, 0, 0, 0.2)' : 'rgba(1, 1, 1, 0.2)';
         ctx.fillRect(- bckgDimensions[0] / 2, - bckgDimensions[1] / 2, ...bckgDimensions);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'lightgrey'; // '#C8C8C8'; // '#E8E8E8'; // 'lightgrey';
+        ctx.fillStyle = this.state.isDarkMode ? 'lightgrey' : 'black'; // '#C8C8C8'; // '#E8E8E8'; // 'lightgrey';
         ctx.fillText(label, 0, 0);
         ctx.restore();
     }
@@ -428,10 +489,17 @@ export default Graph2D;
 
 
 
-function DarkModeSwitch({ toggleThemeState }) {
+// Mobile footer component
+function MobileFooter() {
     return (
-        <div className='darkmodeswitch' onClick={toggleThemeState}>
-            Explore CC
+        <div className='mobile-footer'>
+            <span className='info-icon'>
+                <InfoIcon />
+            </span>
+            <span className='info-text'>
+                We recommend you seeing this visualization on a desktop device for best experience
+            </span>
         </div>
     )
 }
+

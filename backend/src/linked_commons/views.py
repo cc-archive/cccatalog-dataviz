@@ -77,6 +77,8 @@ def build_random_landing_graph(db, landing_graph_size=LANDING_GRAPH_META):
     index = random.randint(a=1, b=total_nodes - 1)
     # Finding the id of the root node
     root_node = db.find(projection=[]).limit(-1).skip(index).next()["_id"]
+    # Making a copy of the root_node as base_node
+    base_node = root_node
     # Set to store all nodes which are already taken into the current random graph
     nodes_id = set()
     nodes_id.add(root_node)
@@ -115,7 +117,7 @@ def build_random_landing_graph(db, landing_graph_size=LANDING_GRAPH_META):
     # Adding nodes metadata
     nodes = add_nodes_metadata(node_list)
 
-    return {"links": links, "nodes": nodes}
+    return {"root_node": base_node, "links": links, "nodes": nodes}
 
 
 def serve_graph_data(request):

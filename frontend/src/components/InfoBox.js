@@ -15,3 +15,4 @@ class InfoBox extends React.Component {
 }
 
 export default InfoBox;
+

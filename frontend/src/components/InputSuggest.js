@@ -20,14 +20,17 @@ class InputSuggest extends Component {
         }
     }
 
+    // fetches the list of node id which contains the same pattern as the argument {value} and caches it
     fetchSuggestions = async (value) => {
         value = value.trim().toLowerCase();
         if (value) {
             if (this.state.cache[value]) {
+                // cache hit
                 this.setState({
                     suggestions: this.state.cache[value]
                 });
             } else {
+                // cache miss
                 let res = await fetch(`${this.props.SERVER_BASE_URL}/suggestions/?q=${value}`);
                 let jsonData = await res.json();
                 if (jsonData['error']) {
@@ -35,6 +38,7 @@ class InputSuggest extends Component {
                         suggestions: [],
                     });
                 } else {
+                    // caching the results
                     this.state.cache[value] = jsonData['suggestions'];
                     this.setState({
                         suggestions: jsonData['suggestions']
@@ -44,6 +48,7 @@ class InputSuggest extends Component {
         }
     }
 
+    // helper function to update the state variable and fetch sugestions
     handleChange = (e) => {
         // Update the value
         this.props.setName(e.target.value);
@@ -84,3 +89,4 @@ class InputSuggest extends Component {
 
 
 export default InputSuggest;
+

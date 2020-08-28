@@ -19,3 +19,4 @@ COPY . ./
 
 # start frontend
 CMD ["npm", "start"]
+

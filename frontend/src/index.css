@@ -11,20 +11,39 @@
 :root {
   --searchbar-height: 60px;
   --popup-width: 36vw;
+  --navbar-height: calc(var(--vh, 1vh) * 10);
+  --animation-duration: 0.7s;
 }
 
 body {
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
-.graph-wrapper #graph-canvas canvas {
-  position: fixed;
-  /* Setting height after subtracting from the searchbar height */
-  /* make sure to keep this aligned with the height in Graph2D component */
-  height: 100vh !important;
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
 }
 
-body.modal-active .content-wrapper .graph-wrapper {
+#graph-canvas {
+  height: calc(var(--vh, 1vh) * 100) !important;
+  width: calc(var(--vw, 1vw) * 100) !important;
+}
+
+.graph-wrapper #graph-canvas canvas {
+  z-index: 90;
+  position: absolute;
+  /* --vh and --vw are set by the Graph2D component */
+  height: calc(var(--vh, 1vh) * 100) !important;
+  width: calc(var(--vw, 1vw) * 100) !important;
+  transition: all var(--animation-duration) ease 0s;
+}
+
+
+body.modal-active .content-wrapper .graph-wrapper,  body.modal-active .navbar-wrapper{
   -webkit-filter: blur(5px) grayscale(50%);
   filter: blur(5px) grayscale(50%);
   pointer-events: none;
@@ -50,19 +69,6 @@ body.modal-active .content-wrapper .graph-wrapper {
   cursor: pointer;
 }
 
-/* INFO BOX */
-.infoBox {
-  position: fixed;
-  top: 30vh;
-  right: 0%;
-  height: 50vh;
-  width: minmax(100px, 15vw);
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
-  color: white;
-}
-/* INFO BOX END */
-
 /* ZOOM TOOLKIT BEGIN */
 .zoomtoolkit-wrapper {
   position: absolute;
@@ -77,11 +83,10 @@ body.modal-active .content-wrapper .graph-wrapper {
 
 .zoomtoolkit-wrapper button {
   margin: 5px;
-  padding: 10px 10px;
+  padding: 10px;
   font-weight: bold;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 10px;
-  font-size: 20px;
   box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.2);
   background-color: rgb(255, 255, 255);
   outline: none;
@@ -97,13 +102,9 @@ body.modal-active .content-wrapper .graph-wrapper {
   box-shadow: 0 0 5px -1px rgba(0, 0, 0, 0.6);
 }
 
-.zoomtoolkit-wrapper button:active img {
-  opacity: 1;
-}
-
-.zoomtoolkit-wrapper button img {
-  width: 20px;
-  opacity: 0.8;
+.zoomtoolkit-wrapper button svg {
+  width: 22px;
+  height: 22px;
 }
 
 .zoomtoolkit-wrapper button:focus {
@@ -273,39 +274,44 @@ body.modal-active .searchbar-main-wrapper {
   background: #525357;
 }
 
-@media all and (max-width: 384px) {
-  .zoomtoolkit-wrapper {
-    bottom: 15px;
-    right: 5px;
-  }
-  .title-main {
-    font-size: 1rem;
-  }
-}
-
 /* SEARCHFILTERBOX END */
 
-/* DARK MODE SWITCH BEGIN */
-.darkmodeswitch {
-  position: fixed;
+/* EXPLORE BUTTON */
+.explore-cc-btn {
+  text-decoration: none;
+  height: fit-content;
   z-index: 100;
+  justify-self: flex-end;
   width: fit-content;
-  padding: 4px 16px;
+  padding: 6px 14px;
+  border-radius: 0px 0px 4px 4px;
   background-color: black;
   color: white;
-  border-radius: 0px 0px 4px 4px;
-  top: 0;
-  left: 90%;
-  transform: translateX(-90%);
   user-select: none;
   cursor: pointer;
 }
 
-html[data-theme="dark"] .darkmodeswitch {
+html[data-theme="dark"] .explore-cc-btn {
   background-color: #ed592f;
 }
 
-/* DARK MODE SWITCH END */
+[data-theme="dark"] .explore-cc-btn {
+  color: white;
+  background-color: #ed592f;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-theme="dark"] .explore-cc-btn:not(.active):hover,
+  [data-theme="dark"] .darkmodeswitch:hover {
+    background-color: white;
+    color: black;
+  }
+  [data-theme="light"] .explore-cc-btn:not(.active):hover,
+  [data-theme="light"] .darkmodeswitch:hover {
+    background-color: #ed592f;
+    color: white;
+  }
+}
 
 /* LICENSE CHART BEGIN */
 
@@ -323,69 +329,74 @@ html[data-theme="dark"] .darkmodeswitch {
   z-index: 1000;
 }
 
-@media only screen and (min-width: 900px) {
-  /* Overriding pop up styling on other elements */
-  body.modal-active .content-wrapper .graph-wrapper {
-    -webkit-filter: none;
-    filter: none;
-    pointer-events: all;
-  }
-  body.modal-active .searchbar-main-wrapper {
-    -webkit-filter: none;
-    filter: none;
-    pointer-events: all;
-  }
+/* LICENSE CHART END */
 
-  body.modal-active .content-wrapper {
-    display: grid;
-    grid-template-columns: 2fr 5fr;
-    grid-auto-flow: row;
-  }
+/* NAVBAR BEGIN */
 
-  #licensechart {
-    grid-column-start: 1;
-    grid-column-end: 2;
-    background: white;
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
-    display: block;
-    padding: 0;
-    margin: 0;
-    z-index: 1;
-    width: 100%;
-    overflow-x: hidden;
-    height: calc(100vh-var(--searchbar-height));
-    border: none;
-  }
-
-  .licensechart-modal-content {
-    margin-top: 15vh;
-    padding: 5px;
-    vertical-align: center;
-    z-index: 3;
-    justify-content: space-between;
-  }
+.navbar-wrapper {
+  position: absolute;
+  top: 0;
+  z-index: 999;
+  display: grid;
+  grid-template-columns: 4fr 3fr 1fr;
+  height: var(--navbar-height);
+  transition: all calc(var(--animation-duration) - 0.2s) ease 0s, background-color 0ms;
+  width: 100%;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-/* LICENSE CHART END */
+
+
+.navbar-wrapper .cc-logo svg {
+  padding: 14px 0px 0px 14px;
+  width: 180px;
+  height: 50px;
+}
+
+.darkmodeswitch {
+  justify-self: center;
+  cursor: pointer;
+  color: white;
+  background-color: black;
+  height: fit-content;
+  padding: 4px 10px 0px 10px;
+  border-radius: 0px 0px 4px 4px;
+  height: fit-content !important;
+}
+
+[data-theme="dark"] .darkmodeswitch {
+  color: white;
+  background-color: #ed592f;
+}
+
+/* NAVBAR END */
 
 /* SIDEBAR BEGIN */
 
 .sidebar-wrapper {
   position: fixed;
+  margin-top: calc(var(--navbar-height));
+  padding-top: calc(var(--vh, 1vh) * 5);
+  transition: all calc(var(--animation-duration)) ease 0s, background-color 0ms;
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 22%;
   min-width: 150px;
+  border-radius: 0px 4px 4px 0px;
   z-index: 100;
-  height: 100vh !important;
+  width: calc(var(--vw, 1vw) * 25);
   overflow-y: auto;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+
 
 .sidebar-wrapper a,
 .sidebar-wrapper .action-btn {
@@ -395,14 +406,6 @@ html[data-theme="dark"] .darkmodeswitch {
 html[data-theme="light"] .sidebar-wrapper {
   background-color: rgba(255, 255, 255, 0.8);
   color: black;
-}
-
-.sidebar-wrapper .cc-logo {
-  width: calc(100% - 0.2rem);
-  padding: 0 0.1rem;
-  margin-top: 2rem;
-  margin-bottom: 5rem;
-  max-height: 50px;
 }
 
 .sidebar-wrapper .project-info .project-heading {
@@ -441,13 +444,6 @@ html[data-theme="light"] .sidebar-wrapper a,
 html[data-theme="light"] .sidebar-wrapper .action-btn {
   color: #04a635;
 }
-
-.sidebar-wrapper svg {
-  width: inherit;
-}
-/* .actions-link{
-  margin-bottom: auto;
-} */
 
 .actions-menu-wrapper {
   margin: 0.4rem 0.8rem;
@@ -520,7 +516,25 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
 
 /* SIDEBAR END */
 
+/* MOBILE FOOTER START */
+.mobile-footer {
+  font-size: 13px;
+  padding: 5px 10px;
+  z-index: 999;
+  position: absolute;
+  bottom: 0px;
+  font-weight: 600;
+  background: #d1dcf1;
+  display: flex;
+  text-align: center;
+}
 
+.mobile-footer .info-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* MOBILE FOOTER END */
 [data-reach-popover] {
   z-index: 100;
 }
@@ -528,3 +542,99 @@ html[data-theme="dark"] .actions-menu-wrapper .actions-menu-item label {
   padding: 6px !important;
   overflow: hidden;
 }
+
+@media all and (max-width: 450px) {
+  .sidebar-wrapper {
+    width: 100vw;
+    border-radius: 0px;
+  }
+  .zoomtoolkit-wrapper {
+    bottom: 50px;
+    right: 5px;
+  }
+  .navbar-wrapper {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  html[data-theme="light"] .navbar-wrapper, .navbar-wrapper.loading {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  .actions-menu-wrapper form {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: center;
+  }
+  #ac-item-graphNodeName {
+    width: 150px;
+    margin-left: 10px;
+  }
+  .actions-menu-item {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+
+  .actions-menu-item:nth-child(2) {
+    justify-self: center;
+  }
+}
+
+
+
+@media all and (max-width: 396px) {
+  .navbar-wrapper .cc-logo svg {
+    width: 120px;
+    height: 50px;
+    padding: 0px;
+    padding-left: 10px;
+  }
+
+  .navbar-wrapper {
+    grid-template-columns: 4fr 3fr 2fr;
+  }
+
+  .explore-cc-btn {
+    width: fit-content;
+    font-size: 12px;
+    padding: 6px 10px;
+    text-align: center;
+  }
+
+  .darkmodeswitch svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #ac-item-graphNodeName {
+    width: 70%;
+    margin-left: 10px;
+  }
+
+  .actions-menu-item button {
+    padding: 8px 20px;
+  }
+}
+
+@media all and (max-width: 384px) {
+  .zoomtoolkit-wrapper button svg {
+    width: 15px;
+    height: 15px;
+    opacity: 0.8;
+  }
+
+  .title-main {
+    font-size: 1rem;
+  }
+}
+
+@media all and (max-width: 289px) {
+  .actions-link {
+    display: none;
+  }
+}
+
+@media all and (max-width: 220px) {
+  .zoomtoolkit-wrapper {
+    display: none;
+  }
+}
+
