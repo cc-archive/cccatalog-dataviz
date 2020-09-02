@@ -41,8 +41,9 @@ src
 
 ### Prerequisites
 
-The frontend application is using react, for which NodeJS and npm are necessary. NodeJS can be installed from [here](https://nodejs.org/en/).
-The backend application is using Django, for which Python necessary. Python can be installed from [here](https://www.python.org/downloads/).
+The frontend application is using react, for which NodeJS **v12+** and npm are necessary. NodeJS can be installed from [here](https://nodejs.org/en/).
+
+The backend application is using Django, for which Python **v3.7+** necessary. Python can be installed from [here](https://www.python.org/downloads/).
 
 ### Frontend
 1. Navigate to `frontend/` directory.
@@ -127,7 +128,7 @@ docker run --name backend \
    --network=linkedcommons-net \
    --rm -d linked_commons/backend
 ```
-5. Now to start the database in a isolated container.
+5. Now to start the database in an isolated container.
 ```bash
 docker run -it --name mongodb \
    --network=linkedcommons-net \
