@@ -19,21 +19,21 @@ src
 │   docker-compose.yml # Development docker compose
 │
 └───GSoC2019
-└───data-release
+└───data-release # Contains some raw unprocessed tsv files and processed output JSON files
 │
-└───frontend
+└───frontend # Contains react.js app to render the visualization in the browser.
 │  |   .env # Contains Backend Server Base Endpoint
 │  │   package.json
 │  │   package.lock.json
 │  │
 │  └───src # Contains all React Components
 │  
-└───backend
+└───backend # Includes Django server source code and scripts to build & update the database. 
    │   requirements.txt
    │   .env # Contains list of environment variables the project needs
    │
    └───scripts # Contains scripts to parse JSON data and upload it to MongoDB server
-   └───src # Contains server side Django Apps
+   └───src # Contains server side Django Apps which defines the API that feeds data to the visualization 
 ```
 
 
