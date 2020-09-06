@@ -90,9 +90,7 @@ python manage.py runserver
 
 ## Setting Up Local Development Environment using Docker
 
-### Development 
-
-1. Make sure that the root directory contains `docker-compose.yml`. And ensure that `backend/.env` has file is updated and `MONGO_HOSTNAME` is set to `mongodb:27017`.
+1. Make sure that the root directory contains `docker-compose.yml`. And ensure that the `backend/.env` file is updated and `MONGO_HOSTNAME` is set to `mongodb:27017`.
 2. Run the following command to build and start the container.
 ```bash
 docker-compose up
@@ -107,9 +105,9 @@ docker-compose up
 
 
 
-### Building production version
+## Building production version
 
-**Important:** For simiplicity the production version can be built only with `docker`. Please note that any changes in project files after build won't get reflected in the running container and you need to rebuild the image again. 
+**Important:** For simiplicity we will be using `docker` to build the production version. Please note that any changes in project files after build won't get reflected in the running container and you need to rebuild the image again. 
 
 1. Before building images, ensure that all the variables in `.env` file are updated and `MONGO_HOSTNAME` is set to `mongodb:27017`.
 2. Now, navigate to backend and then build the `django-backend` image.
