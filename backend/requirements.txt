@@ -1,4 +1,4 @@
-Django==2.2.13
+Django==2.2.24
 django-cors-headers==3.2.1
 dnspython==2.0.0
 gunicorn==19.9.0
